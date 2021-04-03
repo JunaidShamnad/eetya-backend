@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const ItemSchema = new Schema({
+    storeId: {
+        type: String,
+        required: true
+    },
     title: {
         type: String,
         required: true
@@ -10,7 +14,7 @@ const ItemSchema = new Schema({
         type: String,
         required: true
     },
-    category:{
+    category: {
         type: String,
         required: true
     },
@@ -20,8 +24,8 @@ const ItemSchema = new Schema({
     },
     image:
     {
-        data: Buffer,
-        contentType: String
+        type: String,
+        required :true
     },
     date_added: {
         type: Date,
@@ -29,4 +33,4 @@ const ItemSchema = new Schema({
     },
 });
 
-module.exports = Item = mongoose.model('item',ItemSchema);
+module.exports = Item = mongoose.model('item', ItemSchema);
