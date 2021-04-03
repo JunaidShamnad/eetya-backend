@@ -10,12 +10,25 @@ router.get('/', (req, res) => {
 
 
 router.post('/add-item',(req,res)=>{
+      const data = req.body
+   if(!req.session?.Dealer) return res.json({loginErr:true})
+
     try {
-        
-  
+          const newItem = new Item({
+            storeId : '60674897ef835a5c9d1f20c5'  ,
+            title : data.title,
+            description : data.description,
+            category : data.category,
+            price : data.price ,
+            image : data.image
+          })
+ 
+          newItem.save().then(item=>(res.json(item),console.log(item))).catch(e=>(res.json({err:'Something went wrong'}),console.log(e)))
+    
 
     } catch (e) {
         res.json({err:'Sorry something went wrong'})
+        console.log(e);
     }
 })
 
@@ -23,17 +36,20 @@ router.post('/add-item',(req,res)=>{
 
 
 router.post('/login', async (req, res) => {
+    
+     if(req.session?.Dealer) return res.json({loggedIn:true})
+
     try {
         const { email, password } = req.body;
         const foundDealer = await Dealer.findOne({ email })
         if (foundDealer) {
 
             const admin = await bcrypt.compare(password, foundDealer.password)
-            admin ? res.json(foundDealer) : res.json('Sorry Password is incorrect')
+            admin ? (req.session.Dealer = foundDealer,res.json(foundDealer)) : res.json({err:'Sorry Password is incorrect'})
 
-        } else res.json('User not found')
+        } else res.json({err:'User not found'})
     } catch (e) {
-        res.json("Sorry something went wrong")
+        res.json({err:"Sorry something went wrong"})
         console.log(e);
     }
 })
