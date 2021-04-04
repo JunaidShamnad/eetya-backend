@@ -54,6 +54,14 @@ const dealer = mongoose.Schema({
     register_date: {
         type: Date,
         default: Date.now
+    },
+    verified: {
+        type: Boolean,
+        default: false
+    },
+    approved: {
+        type: Boolean,
+        default: true
     }
 })
 

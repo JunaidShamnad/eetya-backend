@@ -1,60 +1,68 @@
 const mongoose = require("mongoose");
 const user = new mongoose.Schema({
-  username:{
+  name: {
     type: String,
     required: true
-},
+  },
   email: {
     type: String,
-    required: [true,'Please enter an email'],
+    required: [true, 'Please enter an email'],
     unique: true,
     lowercase: true,
-},
+  },
   password: {
     type: String,
     required: [true, 'Please enter a valid password'],
     // minlength: [6, 'Minimum password length must be 6 characters']
-},
-  primaryPhone:{
+  },
+  primaryPhone: {
     type: String,
     required: true
-},
-  secondaryNumber:{
+  },
+  secondaryNumber: {
     type: String,
     required: true
-},
+  },
   alternativeEmail: {
     type: String,
     required: true
-},
-  companyName:{
+  },
+  companyName: {
     type: String,
     required: true
-},
-  registrationNumber:{
+  },
+  registrationNumber: {
     type: String,
     required: true
-},
-  typeOfBusiness:{
+  },
+  typeOfBusiness: {
     type: String,
     required: true
-},
+  },
   website: {
     type: String,
     required: false
-},
+  },
   billingAddress: {
     type: String,
     required: true
-},
+  },
   shippingAddress: {
     type: String,
     required: true
-},
+  },
   register_date: {
     type: Date,
     default: Date.now
-}
+  },
+  verified: {
+    type: Boolean,
+    default: false
+  },
+  approved: {
+    type: Boolean,
+    default: true
+  }
 });
 
 module.exports = mongoose.model("User", user);
