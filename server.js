@@ -9,8 +9,9 @@ const session = require("express-session");
 const bodyParser = require("body-parser");
 const fileUpload = require('express-fileupload');
 const dotenv = require('dotenv')
-
-
+const nodemailer = require('nodemailer')
+const { google } = require("googleapis");
+const OAuth2 = google.auth.OAuth2;
 
 // importing  routes 
 const adminRoute = require('./routes/admin')
@@ -23,6 +24,10 @@ dotenv.config()
 const User = require("./models/user");
 
 const Item = require("./models/item");
+
+const Category = require('./models/category');
+
+const categoryController = require('./controllers/categoryController')
 
 mongoose.connect(
   process.env.mongoUri,
@@ -40,15 +45,16 @@ mongoose.connect(
 /// Middleware
 app.use(express.static('public'));
 
-
+app.use(bodyParser({limit: '50mb'}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(
-  cors({
-    origin: "http://localhost:3000", // <-- location of the react app were connecting to
-    credentials: true,
-  })
-);
+app.use(cors());
+// app.use(
+//   cors({
+//     origin: "http://localhost:3000", // <-- location of the react app were connecting to
+//     credentials: true,
+//   })
+// );
 
 app.use(fileUpload());
 app.use(
@@ -103,7 +109,48 @@ app.post('/login', (req, res) => {
     console.log(e);
   }
 })
+//email verification
+const oauth2Client = new OAuth2(
+  "173872994719-pvsnau5mbj47h0c6ea6ojrl7gjqq1908.apps.googleusercontent.com", // ClientID
+  "OKXIYR14wBB_zumf30EC__iJ", // Client Secret
+  "https://developers.google.com/oauthplayground" // Redirect URL
+);
+oauth2Client.setCredentials({
+  refresh_token: "1//04T_nqlj9UVrVCgYIARAAGAQSNwF-L9IrGm-NOdEKBOakzMn1cbbCHgg2ivkad3Q_hMyBkSQen0b5ABfR8kPR18aOoqhRrSlPm9w"
+});
 
+
+const accessToken = oauth2Client.getAccessToken()
+
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'eetyawebsite@gmail.com',
+    pass:'eetya@123website',
+    clientId: "173872994719-pvsnau5mbj47h0c6ea6ojrl7gjqq1908.apps.googleusercontent.com",
+     clientSecret: "OKXIYR14wBB_zumf30EC__iJ",
+    refreshToken: "1//04T_nqlj9UVrVCgYIARAAGAQSNwF-L9IrGm-NOdEKBOakzMn1cbbCHgg2ivkad3Q_hMyBkSQen0b5ABfR8kPR18aOoqhRrSlPm9w",
+   accessToken: accessToken
+                    
+  }
+});
+var mailOptions = {
+  from: '"Auth Admin"ckvaizz@gmail.com',
+  to: 'vaisakh.k591@gmail.com',
+  subject: 'Sending Email using Node.js',
+  text: 'That was easy!'
+};
+
+app.post("/sendEmail",(req,res)=>{
+  transporter.sendMail(mailOptions, function(error, info){
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+      res.json("hello koiiii");
+    }
+  });
+})
 
 
 // app.post("/login", (req, res, next) => {
@@ -193,6 +240,15 @@ app.put("/items/:id", (req, res) => {
     });
   });
 });
+
+app.get('/category', (req, res)=>{
+  console.log('get category called');
+  Category.find().
+  then((data)=>{
+    console.log(data);
+    res.json(data)
+  })
+})
 
 
 const port = process.env.PORT || 4000;
