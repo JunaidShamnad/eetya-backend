@@ -131,18 +131,19 @@ var transporter = nodemailer.createTransport({
     // accessToken: accessToken,
   },
 });
-var mailOptions = {
-  from: 'eetyawebsite@gmail.com',
-  to: "vaisakh.k591@gmail.com, jobins9633@gmail.com",
-  subject: "Sending Email using Node.js",
-  text: "That was easy!",
-};
 
 app.post("/sendEmail", (req, res) => {
+  var mailOptions = {
+    from: "eetyawebsite@gmail.com",
+    to: "vaisakh.k591@gmail.com, jobins9633@gmail.com",
+    subject: "Sending Email using Node.js",
+    text: "That was easy!",
+  };
+
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
-      res.json('error')
+      res.json("error");
     } else {
       console.log("Email sent: " + info.response);
       res.json("hello koiiii");
@@ -247,6 +248,33 @@ app.get("/category", (req, res) => {
   Category.find().then((data) => {
     console.log(data);
     res.json(data);
+  });
+});
+
+app.post("/contact", (req, res) => {
+console.log(req.body);
+let message = '<h3>Message: No message</h3>'
+
+  if(req.body.message != undefined){
+    message = '<h3>Message: '+req.body.message+'</h3>'
+  }
+
+  var mailOptions = {
+    from: "eetyawebsite@gmail.com",
+    to: "vaisakh.k591@gmail.com, jobins9633@gmail.com",
+    subject: `${req.body.name} contacted you.`,
+    html:
+      '<h1>hi admin</h1></br><h3>'+ req.body.name +' has contacted you</h3></br><h3>Name: '+req.body.name+'</h3></br><h3>Email: '+req.body.email+'</h3></br><h3>Phone: '+req.body.phone+'</h3></br>'+message
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+      res.json({ status: false });
+    } else {
+      console.log("Email sent: " + info.response);
+      res.json({ status: true });
+    }
   });
 });
 
