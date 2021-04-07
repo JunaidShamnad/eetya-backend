@@ -10,33 +10,40 @@ router.get("/", (req, res) => {
 
 router.post("/add-item", (req, res) => {
   const data = req.body;
-  if (!req.session?.Dealer) return res.json({ loginErr: true });
+  console.log("+++==",data);
+  console.log(Object.keys(data))
+  console.log(data.image.length)
+  data.image.map((val,index)=>console)
+  let base64 = req.body.croped.replace(/^data:image\/png;base64,/, "");
+    fs.writeFileSync(`./public/datas/photos/${Id}.png`, base64, "base64");
 
-  try {
-    const newItem = new Item({
-      storeId: "60674897ef835a5c9d1f20c5"   ,
-      title: data.title,
-      description: data.description,
-      category: data.category,
-      price: data.price,
-      image: data.image,
-    });
+  // if (!req.session.Dealer) return res.json({ loginErr: true });
 
-    newItem
-      .save()
-      .then((item) => (res.json(item), console.log(item)))
-      .catch(
-        (e) => (res.json({ err: "Something went wrong" }), console.log(e))
-      );
-  } catch (e) {
-    res.json({ err: "Sorry something went wrong" });
-    console.log(e);
-  }
+  // try {
+  //   const newItem = new Item({
+  //     storeId: "60674897ef835a5c9d1f20c5"   ,
+  //     title: data.title,
+  //     description: data.description,
+  //     category: data.category,
+  //     price: data.price,
+  //     image: data.image,
+  //   });
+
+  //   newItem
+  //     .save()
+  //     .then((item) => (res.json(item), console.log(item)))
+  //     .catch(
+  //       (e) => (res.json({ err: "Something went wrong" }), console.log(e))
+  //     );
+  // } catch (e) {
+  //   res.json({ err: "Sorry something went wrong" });
+  //   console.log(e);
+  // }
 });
 
 router.post("/login", async (req, res) => {
   console.log(req.body);
-  if (req.session?.Dealer) return res.json({ loggedIn: true });
+  if (req.session.Dealer) return res.json({ loggedIn: true });
 
   try {
     const { email, password } = req.body;
