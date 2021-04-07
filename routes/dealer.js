@@ -10,33 +10,34 @@ router.get("/", (req, res) => {
 
 router.post("/add-item", (req, res) => {
   const data = req.body;
-  if (!req.session?.Dealer) return res.json({ loginErr: true });
+  console.log("+++==",data);
+  // if (!req.session.Dealer) return res.json({ loginErr: true });
 
-  try {
-    const newItem = new Item({
-      storeId: "60674897ef835a5c9d1f20c5"   ,
-      title: data.title,
-      description: data.description,
-      category: data.category,
-      price: data.price,
-      image: data.image,
-    });
+  // try {
+  //   const newItem = new Item({
+  //     storeId: "60674897ef835a5c9d1f20c5"   ,
+  //     title: data.title,
+  //     description: data.description,
+  //     category: data.category,
+  //     price: data.price,
+  //     image: data.image,
+  //   });
 
-    newItem
-      .save()
-      .then((item) => (res.json(item), console.log(item)))
-      .catch(
-        (e) => (res.json({ err: "Something went wrong" }), console.log(e))
-      );
-  } catch (e) {
-    res.json({ err: "Sorry something went wrong" });
-    console.log(e);
-  }
+  //   newItem
+  //     .save()
+  //     .then((item) => (res.json(item), console.log(item)))
+  //     .catch(
+  //       (e) => (res.json({ err: "Something went wrong" }), console.log(e))
+  //     );
+  // } catch (e) {
+  //   res.json({ err: "Sorry something went wrong" });
+  //   console.log(e);
+  // }
 });
 
 router.post("/login", async (req, res) => {
   console.log(req.body);
-  if (req.session?.Dealer) return res.json({ loggedIn: true });
+  if (req.session.Dealer) return res.json({ loggedIn: true });
 
   try {
     const { email, password } = req.body;

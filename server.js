@@ -48,13 +48,13 @@ app.use(express.static('public'));
 app.use(bodyParser({limit: '50mb'}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
-// app.use(
-//   cors({
-//     origin: "http://localhost:3000", // <-- location of the react app were connecting to
-//     credentials: true,
-//   })
-// );
+//app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000", // <-- location of the react app were connecting to
+    credentials: true,
+  })
+);
 
 app.use(fileUpload());
 app.use(
@@ -86,7 +86,7 @@ app.post('/add-item', (req, res) => {
 
 
 app.post('/login', (req, res) => {
-  if (req.session?.User) {
+  if (req.session.User) {
     console.log(req.session.User);
     return res.json({ userExist: true })
   }
