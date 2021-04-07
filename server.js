@@ -28,6 +28,7 @@ const Item = require("./models/item");
 const Category = require("./models/category");
 
 const categoryController = require("./controllers/categoryController");
+const item = require("./models/item");
 
 mongoose.connect(
   process.env.mongoUri,
@@ -264,7 +265,7 @@ let message = '<h3>Message: No message</h3>'
     to: "vaisakh.k591@gmail.com, jobins9633@gmail.com",
     subject: `${req.body.name} contacted you.`,
     html:
-      '<h1>hi admin</h1></br><h3>'+ req.body.name +' has contacted you</h3></br><h3>Name: '+req.body.name+'</h3></br><h3>Email: '+req.body.email+'</h3></br><h3>Phone: '+req.body.phone+'</h3></br>'+message
+      '<h1>Hi Admin</h1></br><h3>'+ req.body.name +' has contacted you</h3></br><h3>Name: '+req.body.name+'</h3></br><h3>Email: '+req.body.email+'</h3></br><h3>Phone: '+req.body.phone+'</h3></br>'+message
   };
 
   transporter.sendMail(mailOptions, function (error, info) {
@@ -272,11 +273,32 @@ let message = '<h3>Message: No message</h3>'
       console.log(error);
       res.json({ status: false });
     } else {
-      console.log("Email sent: " + info.response);
+      console.log("Email sent:" + info.response);
       res.json({ status: true });
     }
   });
 });
+
+
+app.post('/products', (req, res)=>{
+  const pagination = req.body.pagination ? parseInt(req.body.pagination) : 12;
+    //PageNumber From which Page to Start 
+    const pageNumber = req.body.page ? parseInt(req.body.page) : 1;
+    item.find({})
+        //skip takes argument to skip number of entries 
+        .sort({"_id" : 1})
+        .skip((pageNumber - 1) * pagination)
+        //limit is number of Records we want to display
+        .limit(pagination)
+        .then(data => {
+            res.status(200).json(data)
+        })
+        .catch(err => {
+            res.status(400).send({
+                "err": err
+            })
+        })
+})
 
 const port = process.env.PORT || 4000;
 //Start Server
