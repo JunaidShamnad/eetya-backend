@@ -48,7 +48,7 @@ app.use(express.static("public"));
 app.use(bodyParser({ limit: "50mb" }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-//app.use(cors());
+// app.use(cors());
 app.use(
   cors({
     origin: "http://localhost:3000", // <-- location of the react app were connecting to
@@ -83,13 +83,8 @@ app.post("/add-item", (req, res) => {
   console.log(req.body);
 });
 
-<<<<<<< HEAD
-app.post('/login', (req, res) => {
-  if (req.session.User) {
-=======
 app.post("/login", (req, res) => {
   if (req.session.User) {
->>>>>>> bb6b4293cf8d7e016a8991ed8229678c6452e235
     console.log(req.session.User);
     return res.json({ userExist: true });
   }

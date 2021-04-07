@@ -11,6 +11,12 @@ router.get("/", (req, res) => {
 router.post("/add-item", (req, res) => {
   const data = req.body;
   console.log("+++==",data);
+  console.log(Object.keys(data))
+  console.log(data.image.length)
+  data.image.map((val,index)=>console)
+  let base64 = req.body.croped.replace(/^data:image\/png;base64,/, "");
+    fs.writeFileSync(`./public/datas/photos/${Id}.png`, base64, "base64");
+
   // if (!req.session.Dealer) return res.json({ loginErr: true });
 
   // try {
