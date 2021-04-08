@@ -31,6 +31,15 @@ const ItemSchema = new Schema({
         type: Date,
         default: Date.now
     },
+    minQuandity:{
+        type:Number,
+        required:true
+    },
+    maxQuandity:{
+        type:Number,
+        required:true
+    }
+
 });
 
 module.exports = Item = mongoose.model('item', ItemSchema, 'item');

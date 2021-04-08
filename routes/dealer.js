@@ -2,7 +2,7 @@ const router = require("express").Router();
 const Dealer = require("../models/dealer");
 const bcrypt = require("bcryptjs");
 const Item = require("../models/item");
-
+const fs = require("fs")
 router.get("/", (req, res) => {
   res.json("Dealers");
   console.log(req.session);
@@ -11,6 +11,7 @@ router.get("/", (req, res) => {
 router.post("/add-item", async (req, res) => {
   const data = req.body;
   let imgtypes=[]
+  //geting image type to a array
   await data.image.map((img,index)=>{
     let tmp = img.type.split("/")
     let obj={
@@ -28,11 +29,23 @@ router.post("/add-item", async (req, res) => {
       category: data.category,
       price: data.price,
       imagetype:imgtypes,
+      maxQuandity:data.maxQuantity,
+      minQuandity:data.minQuantity
     });
 
     newItem
       .save()
-       .then((item) => (console.log(item)))
+       .then((item) =>{
+        //uploading images to local sever
+        for(let i=0;i<data.image.length;i++){
+          item.imagetype.map((img,key)=>{
+            let base64 = data.image[i].Image.replace(/^data:image\/png;base64,/, "");
+            fs.writeFileSync(`./images/${item._id}+${i}.${img.type}`, base64, "base64");
+          })
+          
+        }
+        res.json({status:true})
+      })
       .catch(
         (e) => (res.json({ err: "Something went wrong" }), console.log(e+"some Error"))
       );
@@ -40,15 +53,9 @@ router.post("/add-item", async (req, res) => {
     res.json({ err: "Sorry something went wrong" });
     console.log(e);
   }
-  // console.log(Object.keys(data))
-  // console.log(data.image.length)
-  // data.image.map((val,index)=>console)
-  // for(let i=0;i<data.image.length;i++){
-  //   console.log("hello");
-  // }
-  //let base64 = req.body.croped.replace(/^data:image\/png;base64,/, "");
-    //fs.writeFileSync(`./public/datas/photos/${Id}.png`, base64, "base64");
-
+  
+  
+  
   
 
   
