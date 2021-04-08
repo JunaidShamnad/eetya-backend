@@ -8,37 +8,50 @@ router.get("/", (req, res) => {
   console.log(req.session);
 });
 
-router.post("/add-item", (req, res) => {
+router.post("/add-item", async (req, res) => {
   const data = req.body;
-  console.log("+++==",data);
-  console.log(Object.keys(data))
-  console.log(data.image.length)
-  data.image.map((val,index)=>console)
-  let base64 = req.body.croped.replace(/^data:image\/png;base64,/, "");
-    fs.writeFileSync(`./public/datas/photos/${Id}.png`, base64, "base64");
-
+  let imgtypes=[]
+  await data.image.map((img,index)=>{
+    let tmp = img.type.split("/")
+    let obj={
+      index:index,
+      type:tmp[1]
+    }
+    imgtypes.push(obj)
+  })
   // if (!req.session.Dealer) return res.json({ loginErr: true });
+  try {
+    const newItem = new Item({
+      dealerId: "60674897ef835a5c9d1f20c5"   ,
+      title: data.title,
+      description: data.description,
+      category: data.category,
+      price: data.price,
+      imagetype:imgtypes,
+    });
 
-  // try {
-  //   const newItem = new Item({
-  //     storeId: "60674897ef835a5c9d1f20c5"   ,
-  //     title: data.title,
-  //     description: data.description,
-  //     category: data.category,
-  //     price: data.price,
-  //     image: data.image,
-  //   });
-
-  //   newItem
-  //     .save()
-  //     .then((item) => (res.json(item), console.log(item)))
-  //     .catch(
-  //       (e) => (res.json({ err: "Something went wrong" }), console.log(e))
-  //     );
-  // } catch (e) {
-  //   res.json({ err: "Sorry something went wrong" });
-  //   console.log(e);
+    newItem
+      .save()
+       .then((item) => (console.log(item)))
+      .catch(
+        (e) => (res.json({ err: "Something went wrong" }), console.log(e+"some Error"))
+      );
+  } catch (e) {
+    res.json({ err: "Sorry something went wrong" });
+    console.log(e);
+  }
+  // console.log(Object.keys(data))
+  // console.log(data.image.length)
+  // data.image.map((val,index)=>console)
+  // for(let i=0;i<data.image.length;i++){
+  //   console.log("hello");
   // }
+  //let base64 = req.body.croped.replace(/^data:image\/png;base64,/, "");
+    //fs.writeFileSync(`./public/datas/photos/${Id}.png`, base64, "base64");
+
+  
+
+  
 });
 
 router.post("/login", async (req, res) => {
