@@ -245,9 +245,9 @@ app.put("/items/:id", (req, res) => {
 });
 
 app.get("/category", (req, res) => {
-  console.log("get category called");
   Category.find().then((data) => {
     res.json(data);
+    console.log(data);
   });
 });
 
