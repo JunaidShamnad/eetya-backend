@@ -2,6 +2,9 @@ const Admin = require('../models/admin')
 const router = require('express').Router()
 const bcrypt = require('bcryptjs')
 
+const Category = require("../models/category");
+
+
 const verifyAdmin = (req, res, next) => {
     if (req.session.Admin) next()
     else res.json({ loginErr: true })
@@ -27,6 +30,10 @@ router.post('/login', async (req, res) => {
 
 router.post('/updateCredentials', (req, res) => {
 
+})
+
+router.post('/create-category', (req, res)=>{
+    // category.
 })
 
 module.exports = router;

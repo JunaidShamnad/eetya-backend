@@ -247,13 +247,11 @@ app.put("/items/:id", (req, res) => {
 app.get("/category", (req, res) => {
   console.log("get category called");
   Category.find().then((data) => {
-    console.log(data);
     res.json(data);
   });
 });
 
 app.post("/contact", (req, res) => {
-console.log(req.body);
 let message = '<h3>Message: No message</h3>'
 
   if(req.body.message != undefined){

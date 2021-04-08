@@ -18,6 +18,14 @@ const ItemSchema = new Schema({
         type: String,
         required: true
     },
+    minQuantity: {
+        type: String,
+        required: true
+    },
+    maxQuantity: {
+        type: String,
+        required: true
+    },
     price: {
         type: Number,
         required: true
