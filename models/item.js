@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const ItemSchema = new Schema({
-    storeId: {
+    dealerId: {
         type: String,
         required: true
     },
@@ -22,9 +22,9 @@ const ItemSchema = new Schema({
         type: Number,
         required: true
     },
-    image:
+    imagetype:  
     {
-        type: String,
+        type: Array,
         required :true
     },
     date_added: {
