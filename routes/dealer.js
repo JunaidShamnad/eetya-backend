@@ -20,7 +20,7 @@ router.post("/add-item", async (req, res) => {
     }
     imgtypes.push(obj)
   })
-  // if (!req.session.Dealer) return res.json({ loginErr: true });
+   if (!req.session.Dealer) return res.json({ loginErr: true });
   try {
     const newItem = new Item({
       dealerId: "60674897ef835a5c9d1f20c5"   ,
@@ -53,14 +53,10 @@ router.post("/add-item", async (req, res) => {
     res.json({ err: "Sorry something went wrong" });
     console.log(e);
   }
-  
-  
-  
-  
-
-  
 });
 
+
+//dealer login 
 router.post("/login", async (req, res) => {
   console.log(req.body);
   if (req.session.Dealer) return res.json({ loggedIn: true });
