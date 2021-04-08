@@ -42,4 +42,16 @@ router.post('/create-category', (req, res)=>{
     .catch((e)=>res.json({status:false, error:e}))
 })
 
+router.post('/delete-category', (req, res)=>{
+    category.deleteOne({_id:req.body.id})
+    .then(()=>res.json({status:true}))
+    .catch(()=>res.json({status:false}))
+})
+
+router.post('/edit-category', (req, res)=>{
+    category.replaceOne({_id:req.body.id}, {categoryName:req.body.categoryName})
+    .then(()=>res.json({status:true}))
+    .catch(()=>res.json({status:false}))
+})
+
 module.exports = router;
