@@ -96,7 +96,11 @@ app.post("/login", (req, res) => {
           console.log(data);
           if (data) {
             const token = jwt.sign({email:user.email, _id: user._id} , 'secret', {expiresIn:'1h'})
-            res.json({user: user, token});
+            if(user.isVerified){
+            res.json({user: user, token});        
+            }else{
+              res.json({unVerified:true})
+            }
           } else res.json({ err: "Password wrong" });
         });
       } else {
@@ -198,7 +202,7 @@ app.post("/register", (req, res) => {
       });
       await newUser.save();
       const token = jwt.sign({email:newUser.alternativeEmail, id:newUser._id}, 'secret', {expiresIn:'1h'})
-      res.send({token, user:newUser});
+      res.send({status:true});
     }
   });
 });
@@ -256,9 +260,9 @@ app.put("/items/:id", (req, res) => {
 app.get("/category", (req, res) => {
   Category.find().then((data) => {
     res.json(data);
-    
   });
 });
+
 app.get('/wholesaler',(req,res)=>{
   User.find({role:2}).then(data=>res.json(data))
 })
