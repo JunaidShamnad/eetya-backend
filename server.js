@@ -31,7 +31,7 @@ const Category = require("./models/category");
 
 const categoryController = require("./controllers/categoryController");
 const item = require("./models/item");
-
+const dealer = require("./models/dealer")
 mongoose.connect(
   process.env.mongoUri,
   {
@@ -302,6 +302,7 @@ app.post('/products', (req, res)=>{
           
            data.map((pro,index)=>{
             let temp ={
+              id:pro._id,
              title:pro.title,
             description:pro.description,
             category:pro.category,
@@ -330,6 +331,51 @@ app.post('/products', (req, res)=>{
                 "err": err
             })
         })
+})
+
+//get single product
+app.post('/Product',(req,res)=>{
+  item.findOne({_id:req.body.id}).then((data)=>{
+    let product={
+      title:data.title,
+      id:data._id,
+      description:data.description,
+      added_date:data.date_added,
+      minQuantity:data.minQuantity,
+      maxQuantity:data.maxQuantity,
+      category:data.category,
+      price:data.price,
+      images:[]
+    }
+    data.imagetype.map((val,index)=>{
+      let image = fs.readFileSync(`./images/${data._id}+${index}.${val.type}`);
+      const img64= Buffer.from(image).toString('base64');
+      const img={
+        data:img64.replace(`dataimage\/${val.type}base64`, ""),
+        type:val.type
+      }
+      product.images.push(img);
+    })
+    //get user details
+    // dealer.findOne({_id:data.dealerId}).then((usr)=>{
+    //   let user={
+    //     name:usr.username,
+    //     email:usr.email,
+    //     number:usr.primaryPhone,
+    //     companyname:usr.companyname
+    //   }
+    //   res.json({Product:product,User:user});
+    // }).catch(e=>res.json({error:"something went wrong"}))
+    
+    let user={
+      name:"vaisakh",
+      email:"ckvaizz@gmail.com",
+      number:"4444444444",
+      companyname:"google"
+    }
+    res.json({Product:product,User:user})
+    
+  }).catch(e=>res.json({error:"something went wrong"}))
 })
  
 const port = process.env.PORT || 4000;
