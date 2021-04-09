@@ -170,7 +170,7 @@ app.post("/sendEmail", (req, res) => {
 // });
 app.post("/register", (req, res) => {
   console.log(req.body);
-  User.findOne({ username: req.body.username }, async (err, doc) => {
+  User.findOne({ username: req.body.email }, async (err, doc) => {
     if (err) throw err;
     if (doc) res.send("User Already Exists");
     if (!doc) {
