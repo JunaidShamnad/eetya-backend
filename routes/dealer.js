@@ -10,6 +10,7 @@ router.get("/", (req, res) => {
 
 router.post("/add-item", async (req, res) => {
   const data = req.body;
+  //console.log(Object.key(data))
   let imgtypes=[]
   //geting image type to a array
   await data.image.map((img,index)=>{
@@ -20,7 +21,7 @@ router.post("/add-item", async (req, res) => {
     }
     imgtypes.push(obj)
   })
-   if (!req.session.Dealer) return res.json({ loginErr: true });
+   //if (!req.session.Dealer) return res.json({ loginErr: true });
   try {
     const newItem = new Item({
       dealerId: "60674897ef835a5c9d1f20c5"   ,
@@ -29,8 +30,8 @@ router.post("/add-item", async (req, res) => {
       category: data.category,
       price: data.price,
       imagetype:imgtypes,
-      maxQuandity:data.maxQuantity,
-      minQuandity:data.minQuantity
+      maxQuantity:data.maxQuantity,
+      minQuantity:data.minQuantity
     });
 
     newItem
@@ -41,6 +42,7 @@ router.post("/add-item", async (req, res) => {
           item.imagetype.map((img,key)=>{
             let base64 = data.image[i].Image.replace(/^data:image\/png;base64,/, "");
             fs.writeFileSync(`./images/${item._id}+${i}.${img.type}`, base64, "base64");
+            
           })
           
         }
