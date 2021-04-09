@@ -12,6 +12,7 @@ const dotenv = require("dotenv");
 const nodemailer = require("nodemailer");
 const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
+const jwt = require('jsonwebtoken')
 
 // importing  routes
 const adminRoute = require("./routes/admin");
@@ -94,8 +95,9 @@ app.post("/login", (req, res) => {
       if (user) {
         bcrypt.compare(req.body.password, user.password).then((data) => {
           if (data) {
+            const token = jwt.sign({email:user.alternativeEmail, _id: user._id} , 'secret', {expiresIn:'1h'})
             req.session.User = user;
-            res.json(user);
+            res.json({user: user, token});
           } else res.json({ err: "Password wrong" });
         });
       } else res.json({ err: "User not found" });
@@ -173,6 +175,10 @@ app.post("/register", (req, res) => {
     if (doc) res.send("User Already Exists");
     if (!doc) {
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
+      let role = 1;
+      if(req.body.category === 'wholesaler'){
+        role = 2;
+      }
 
       const newUser = new User({
         username: req.body.username,
@@ -187,9 +193,11 @@ app.post("/register", (req, res) => {
         website: req.body.website,
         billingAddress: req.body.billingAddress,
         shippingAddress: req.body.shippingAddress,
+        role:role
       });
       await newUser.save();
-      res.send("User Created");
+      const token = jwt.sign({email:newUser.alternativeEmail, id:newUser._id}, 'secret', {expiresIn:'1h'})
+      res.send({token, newUser});
     }
   });
 });
