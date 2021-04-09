@@ -31,7 +31,7 @@ const Category = require("./models/category");
 
 const categoryController = require("./controllers/categoryController");
 const item = require("./models/item");
-const dealer = require("./models/dealer")
+
 mongoose.connect(
   process.env.mongoUri,
   {
@@ -256,10 +256,12 @@ app.put("/items/:id", (req, res) => {
 app.get("/category", (req, res) => {
   Category.find().then((data) => {
     res.json(data);
-    console.log(data);
+    
   });
 });
-
+app.get('/wholesaler',(req,res)=>{
+  User.find({role:2}).then(data=>res.json(data))
+})
 app.post("/contact", (req, res) => {
 let message = '<h3>Message: No message</h3>'
 
@@ -357,7 +359,7 @@ app.post('/Product',(req,res)=>{
       product.images.push(img);
     })
     //get user details
-    // dealer.findOne({_id:data.dealerId}).then((usr)=>{
+    // User.findOne({_id:data.dealerId}).then((usr)=>{
     //   let user={
     //     name:usr.username,
     //     email:usr.email,
@@ -378,6 +380,39 @@ app.post('/Product',(req,res)=>{
   }).catch(e=>res.json({error:"something went wrong"}))
 })
  
+//get product with category
+app.post("/get-cat-products",(req,res)=>{
+  
+  item.find({category:req.body.category}).then(data=>{
+    let products=[]
+          
+           data.map((pro,index)=>{
+            let temp ={
+              id:pro._id,
+             title:pro.title,
+            description:pro.description,
+            category:pro.category,
+            price:pro.price,
+            maxQuantity:pro.maxQuantity,
+            minQuantity:pro.maxQuantity,
+            images:[]
+          }
+           pro.imagetype.map((val,index)=>{
+            let image = fs.readFileSync(`./images/${pro._id}+${index}.${val.type}`);
+            const img64= Buffer.from(image).toString('base64');
+            const img={
+              data:img64.replace(`dataimage\/${val.type}base64`, ""),
+              type:val.type
+            }
+            temp.images.push(img);
+          })
+          products.push(temp)
+            
+          })
+          console.log(products)
+          res.json(products)
+  })
+})
 const port = process.env.PORT || 4000;
 //Start Server
 app.listen(port, () => {
