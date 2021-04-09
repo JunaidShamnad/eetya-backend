@@ -12,6 +12,7 @@ const dotenv = require("dotenv");
 const nodemailer = require("nodemailer");
 const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
+const fs = require("fs");
 const jwt = require('jsonwebtoken')
 
 // importing  routes
@@ -296,8 +297,33 @@ app.post('/products', (req, res)=>{
         .skip((pageNumber - 1) * pagination)
         //limit is number of Records we want to display
         .limit(pagination)
-        .then(data => {
-            res.status(200).json(data)
+        .then( data => {
+          let products=[]
+          
+           data.map((pro,index)=>{
+            let temp ={
+             title:pro.title,
+            description:pro.description,
+            category:pro.category,
+            price:pro.price,
+            maxQuandity:pro.maxQuandity,
+            minQuandity:pro.maxQuandity,
+            images:[]
+          }
+           pro.imagetype.map((val,index)=>{
+            let image = fs.readFileSync(`./images/${pro._id}+${index}.${val.type}`);
+            const img64= Buffer.from(image).toString('base64');
+            const img={
+              data:img64.replace(`dataimage\/${val.type}base64`, ""),
+              type:val.type
+            }
+            temp.images.push(img);
+          })
+          products.push(temp)
+            
+          })
+          console.log(products.length)
+            return res.status(200).json(products)
         })
         .catch(err => {
             res.status(400).send({

@@ -39,11 +39,11 @@ const ItemSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    minQuandity:{
+    minQuantity:{
         type:Number,
         required:true
     },
-    maxQuandity:{
+    maxQuantity:{
         type:Number,
         required:true
     }
