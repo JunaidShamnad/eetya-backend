@@ -87,21 +87,21 @@ app.post("/add-item", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  if (req.session.User) {
-    console.log(req.session.User);
-    return res.json({ userExist: true });
-  }
+ console.log(req.body);
   try {
-    User.findOne({ username: req.body.username }).then((user) => {
+    User.findOne({ email: req.body.email }).then((user, e) => {
+      console.log(e);
       if (user) {
         bcrypt.compare(req.body.password, user.password).then((data) => {
+          console.log(data);
           if (data) {
-            const token = jwt.sign({email:user.alternativeEmail, _id: user._id} , 'secret', {expiresIn:'1h'})
-            req.session.User = user;
+            const token = jwt.sign({email:user.email, _id: user._id} , 'secret', {expiresIn:'1h'})
             res.json({user: user, token});
           } else res.json({ err: "Password wrong" });
         });
-      } else res.json({ err: "User not found" });
+      } else {
+        res.json({ err: "User not found" })
+      }
     });
   } catch (e) {
     res.json({ err: "Sorry something went wrong" });
@@ -171,13 +171,13 @@ app.post("/sendEmail", (req, res) => {
 // });
 app.post("/register", (req, res) => {
   console.log(req.body);
-  User.findOne({ username: req.body.username }, async (err, doc) => {
+  User.findOne({ username: req.body.email }, async (err, doc) => {
     if (err) throw err;
     if (doc) res.send("User Already Exists");
     if (!doc) {
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
       let role = 1;
-      if(req.body.category === 'wholesaler'){
+      if(req.body.role === 'wholesaler'){
         role = 2;
       }
 
@@ -198,7 +198,7 @@ app.post("/register", (req, res) => {
       });
       await newUser.save();
       const token = jwt.sign({email:newUser.alternativeEmail, id:newUser._id}, 'secret', {expiresIn:'1h'})
-      res.send({token, newUser});
+      res.send({token, user:newUser});
     }
   });
 });
