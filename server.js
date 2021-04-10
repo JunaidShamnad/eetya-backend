@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId
 const express = require("express");
 const cors = require("cors");
 // const passport = require("passport");
@@ -19,6 +20,7 @@ const jwt = require("jsonwebtoken");
 const adminRoute = require("./routes/admin");
 const buyerRoute = require("./routes/buyer");
 const dealerRouter = require("./routes/dealer");
+const orderRouter = require('./routes/order')
 
 const app = express();
 dotenv.config();
@@ -80,6 +82,7 @@ app.use(cookieParser("secretcode"));
 app.use("/admin", adminRoute);
 app.use("/buyer", buyerRoute);
 app.use("/dealer", dealerRouter);
+app.use('/order', orderRouter)
 
 app.post("/add-item", (req, res) => {
   res.json("ok");
@@ -389,6 +392,7 @@ app.post("/Product", (req, res) => {
       User.findOne({ _id: data.dealerId })
         .then((usr) => {
           let user = {
+            id: usr._id,
             name: usr.username,
             email: usr.email,
             number: usr.primaryPhone,

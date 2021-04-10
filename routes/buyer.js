@@ -65,7 +65,7 @@ router.get("/place-order/:id/:userId", async (req, res) => {
 //add-to cart
 router.post("/add-to-cart", async (req, res) => {
   try {
-    const { prodId, userId, name, price } = req.body;
+    const { prodId, userId, name, price, storeId } = req.body;
     const qnt = Math.abs(req.body.qnt);
     const foundCart = await Cart.findOne({ userId: userId });
 
@@ -75,6 +75,7 @@ router.post("/add-to-cart", async (req, res) => {
       name: name,
       quantity: qnt,
       price: price,
+      storeId: storeId
     };
     console.log(newItem);
     if (foundCart) {
@@ -118,14 +119,14 @@ router.post("/add-to-cart", async (req, res) => {
 
 router.post("/change-qnt", (req, res) => {
   try {
-    const {newQnt, prodId,  userId } = req.body;
-    
+    const { value, productId, userId } = req.body;
+
     Cart.findOneAndUpdate(
-      { userId: userId, "items.productId": prodId },
-      { $inc: { "items.$.quantity": newQnt } },
+      { userId: userId, "items.productId": productId },
+      { $inc: { "items.$.quantity": value } },
       { new: true }
     )
-      .then((cart) => res.json({status:true}))
+      .then((cart) => res.json({ status: true, cart }))
       .catch((e) => res.json({ err: e }));
   } catch (e) {
     console.log(e);
@@ -166,15 +167,14 @@ router.get("/empty-cart/:id", async (req, res) => {
 });
 
 router.post("/cart", (req, res) => {
-    console.log(req.body.id);
+  console.log(req.body.id);
   Cart.findOne({ userId: req.body.id }).then((cart) => {
     console.log(cart);
     if (cart) {
       res.json({ cart });
     } else {
-        res.json({ error: "no cart found" });
+      res.json({ error: "no cart found" });
     }
-    
   });
 });
 
@@ -189,4 +189,19 @@ router.post("/confirm-product", (req, res) => {
     })
     .catch((e) => res.json(e));
 });
+
+router.post('/cart-count', (req, res)=>{
+    const {userId} = req.body
+
+    console.log('cart-count'+userId);
+    Cart.find({userId:userId}).then((cart)=>{
+        if(cart.items){
+            res.json({count:cart.items.length})
+        }else{
+            res.json({count:0})
+        }
+    })
+})
+
+
 module.exports = router;
