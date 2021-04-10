@@ -13,7 +13,7 @@ const nodemailer = require("nodemailer");
 const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
 const fs = require("fs");
-const jwt = require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
 
 // importing  routes
 const adminRoute = require("./routes/admin");
@@ -87,7 +87,7 @@ app.post("/add-item", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
- console.log(req.body);
+  console.log(req.body);
   try {
     User.findOne({ email: req.body.email }).then((user, e) => {
       console.log(e);
@@ -95,16 +95,20 @@ app.post("/login", (req, res) => {
         bcrypt.compare(req.body.password, user.password).then((data) => {
           console.log(data);
           if (data) {
-            const token = jwt.sign({email:user.email, _id: user._id} , 'secret', {expiresIn:'1h'})
-            if(user.isVerified){
-            res.json({user: user, token});        
-            }else{
-              res.json({unVerified:true})
+            const token = jwt.sign(
+              { email: user.email, _id: user._id },
+              "secret",
+              { expiresIn: "1h" }
+            );
+            if (user.isVerified) {
+              res.json({ user: user, token });
+            } else {
+              res.json({ unVerified: true });
             }
           } else res.json({ err: "Password wrong" });
         });
       } else {
-        res.json({ err: "User not found" })
+        res.json({ err: "User not found" });
       }
     });
   } catch (e) {
@@ -181,7 +185,7 @@ app.post("/register", (req, res) => {
     if (!doc) {
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
       let role = 1;
-      if(req.body.role === 'wholesaler'){
+      if (req.body.role === "wholesaler") {
         role = 2;
       }
 
@@ -198,11 +202,15 @@ app.post("/register", (req, res) => {
         website: req.body.website,
         billingAddress: req.body.billingAddress,
         shippingAddress: req.body.shippingAddress,
-        role:role
+        role: role,
       });
       await newUser.save();
-      const token = jwt.sign({email:newUser.alternativeEmail, id:newUser._id}, 'secret', {expiresIn:'1h'})
-      res.send({status:true});
+      const token = jwt.sign(
+        { email: newUser.alternativeEmail, id: newUser._id },
+        "secret",
+        { expiresIn: "1h" }
+      );
+      res.send({ status: true });
     }
   });
 });
@@ -263,14 +271,14 @@ app.get("/category", (req, res) => {
   });
 });
 
-app.get('/wholesaler',(req,res)=>{
-  User.find({role:2}).then(data=>res.json(data))
-})
+app.get("/wholesaler", (req, res) => {
+  User.find({ role: 2 }).then((data) => res.json(data));
+});
 app.post("/contact", (req, res) => {
-let message = '<h3>Message: No message</h3>'
+  let message = "<h3>Message: No message</h3>";
 
-  if(req.body.message != undefined){
-    message = '<h3>Message: '+req.body.message+'</h3>'
+  if (req.body.message != undefined) {
+    message = "<h3>Message: " + req.body.message + "</h3>";
   }
 
   var mailOptions = {
@@ -278,7 +286,16 @@ let message = '<h3>Message: No message</h3>'
     to: "vaisakh.k591@gmail.com, jobins9633@gmail.com",
     subject: `${req.body.name} contacted you.`,
     html:
-      '<h1>Hi Admin</h1></br><h3>'+ req.body.name +' has contacted you</h3></br><h3>Name: '+req.body.name+'</h3></br><h3>Email: '+req.body.email+'</h3></br><h3>Phone: '+req.body.phone+'</h3></br>'+message
+      "<h1>Hi Admin</h1></br><h3>" +
+      req.body.name +
+      " has contacted you</h3></br><h3>Name: " +
+      req.body.name +
+      "</h3></br><h3>Email: " +
+      req.body.email +
+      "</h3></br><h3>Phone: " +
+      req.body.phone +
+      "</h3></br>" +
+      message,
   };
 
   transporter.sendMail(mailOptions, function (error, info) {
@@ -292,191 +309,202 @@ let message = '<h3>Message: No message</h3>'
   });
 });
 
-
-app.post('/products', (req, res)=>{
+app.post("/products", (req, res) => {
   const pagination = req.body.pagination ? parseInt(req.body.pagination) : 12;
-    //PageNumber From which Page to Start 
-    const pageNumber = req.body.page ? parseInt(req.body.page) : 1;
-    item.find({})
-        //skip takes argument to skip number of entries 
-        .sort({"_id" : 1})
-        .skip((pageNumber - 1) * pagination)
-        //limit is number of Records we want to display
-        .limit(pagination)
-        .then( data => {
-          let products=[]
-          
-           data.map((pro,index)=>{
-            let temp ={
-              id:pro._id,
-             title:pro.title,
-            description:pro.description,
-            category:pro.category,
-            price:pro.price,
-            maxQuandity:pro.maxQuandity,
-            minQuandity:pro.maxQuandity,
-            images:[]
-          }
-           pro.imagetype.map((val,index)=>{
-            let image = fs.readFileSync(`./images/${pro._id}+${index}.${val.type}`);
-            const img64= Buffer.from(image).toString('base64');
-            const img={
-              data:img64.replace(`dataimage\/${val.type}base64`, ""),
-              type:val.type
-            }
-            temp.images.push(img);
-          })
-          products.push(temp)
-            
-          })
-          console.log(products.length)
-            return res.status(200).json(products)
-        })
-        .catch(err => {
-            res.status(400).send({
-                "err": err
-            })
-        })
-})
+  //PageNumber From which Page to Start
+  const pageNumber = req.body.page ? parseInt(req.body.page) : 1;
+  item
+    .find({})
+    //skip takes argument to skip number of entries
+    .sort({ _id: 1 })
+    .skip((pageNumber - 1) * pagination)
+    //limit is number of Records we want to display
+    .limit(pagination)
+    .then((data) => {
+      let products = [];
+
+      data.map((pro, index) => {
+        let temp = {
+          id: pro._id,
+          title: pro.title,
+          description: pro.description,
+          category: pro.category,
+          price: pro.price,
+          maxQuandity: pro.maxQuandity,
+          minQuandity: pro.maxQuandity,
+          images: [],
+        };
+        pro.imagetype.map((val, index) => {
+          let image = fs.readFileSync(
+            `./images/${pro._id}+${index}.${val.type}`
+          );
+          const img64 = Buffer.from(image).toString("base64");
+          const img = {
+            data: img64.replace(`dataimage\/${val.type}base64`, ""),
+            type: val.type,
+          };
+          temp.images.push(img);
+        });
+        products.push(temp);
+      });
+      console.log(products.length);
+      return res.status(200).json(products);
+    })
+    .catch((err) => {
+      res.status(400).send({
+        err: err,
+      });
+    });
+});
 
 //get single product
-app.post('/Product',(req,res)=>{
-  console.log('/product');
-  item.findOne({_id:req.body.id}).then((data)=>{
-    let product={
-      title:data.title,
-      id:data._id,
-      description:data.description,
-      added_date:data.date_added,
-      minQuantity:data.minQuantity,
-      maxQuantity:data.maxQuantity,
-      category:data.category,
-      price:data.price,
-      images:[]
-    }
-    data.imagetype.map((val,index)=>{
-      let image = fs.readFileSync(`./images/${data._id}+${index}.${val.type}`);
-      const img64= Buffer.from(image).toString('base64');
-      const img={
-        data:img64.replace(`dataimage\/${val.type}base64`, ""),
-        type:val.type
-      }
-      product.images.push(img);
-    })
-    // get user details
-    User.findOne({_id:data.dealerId}).then((usr)=>{
-      let user={
-        name:usr.username,
-        email:usr.email,
-        number:usr.primaryPhone,
-        companyname:usr.companyname
-      }
-      res.json({Product:product,User:user});
-    }).catch(e=>res.json({error:"something went wrong"}))
-    
-    
-    // res.json({Product:product,User:user})
-    
-  }).catch(e=>res.json({error:"something went wrong . "}))
-})
- 
-//get product with category
-app.post("/get-cat-products",(req,res)=>{
-  
-  item.find({category:req.body.category}).then(data=>{
-    let products=[]
-          
-           data.map((pro,index)=>{
-            let temp ={
-              id:pro._id,
-             title:pro.title,
-            description:pro.description,
-            category:pro.category,
-            price:pro.price,
-            maxQuantity:pro.maxQuantity,
-            minQuantity:pro.maxQuantity,
-            images:[]
-          }
-           pro.imagetype.map((val,index)=>{
-            let image = fs.readFileSync(`./images/${pro._id}+${index}.${val.type}`);
-            const img64= Buffer.from(image).toString('base64');
-            const img={
-              data:img64.replace(`dataimage\/${val.type}base64`, ""),
-              type:val.type
-            }
-            temp.images.push(img);
-          })
-          products.push(temp)
-            
-          })
-          
-          res.json(products)
-  })
-})
+app.post("/Product", (req, res) => {
+  console.log("/product");
+  item
+    .findOne({ _id: req.body.id })
+    .then((data) => {
+      let product = {
+        title: data.title,
+        id: data._id,
+        description: data.description,
+        added_date: data.date_added,
+        minQuantity: data.minQuantity,
+        maxQuantity: data.maxQuantity,
+        category: data.category,
+        price: data.price,
+        images: [],
+      };
+      data.imagetype.map((val, index) => {
+        let image = fs.readFileSync(
+          `./images/${data._id}+${index}.${val.type}`
+        );
+        const img64 = Buffer.from(image).toString("base64");
+        const img = {
+          data: img64.replace(`dataimage\/${val.type}base64`, ""),
+          type: val.type,
+        };
+        product.images.push(img);
+      });
+      // get user details
+      User.findOne({ _id: data.dealerId })
+        .then((usr) => {
+          let user = {
+            name: usr.username,
+            email: usr.email,
+            number: usr.primaryPhone,
+            companyname: usr.companyname,
+          };
+          res.json({ Product: product, User: user });
+        })
+        .catch((e) => res.json({ error: "something went wrong" }));
 
-app.get('/newArrivals',(req,res)=>{
-  item.find({}).sort({"_id" : -1}).limit(6).then(data=>{
-    let products=[]
-          
-           data.map((pro,index)=>{
-            let temp ={
-              id:pro._id,
-             title:pro.title,
-            description:pro.description,
-            category:pro.category,
-            price:pro.price,
-            maxQuantity:pro.maxQuantity,
-            minQuantity:pro.maxQuantity,
-            images:[]
-          }
-           pro.imagetype.map((val,index)=>{
-            let image = fs.readFileSync(`./images/${pro._id}+${index}.${val.type}`);
-            const img64= Buffer.from(image).toString('base64');
-            const img={
-              data:img64.replace(`dataimage\/${val.type}base64`, ""),
-              type:val.type
-            }
-            temp.images.push(img);
-          })
-          products.push(temp)
-            
-          })
-          res.json(products)
-  })
-})
-app.post('/searchProducts',(req,res)=>{
-  item.find({ title: { $regex: req.body.data, $options: "$i" } }).then(data=>{
-    let products=[]
-          
-           data.map((pro,index)=>{
-            let temp ={
-              id:pro._id,
-             title:pro.title,
-            description:pro.description,
-            category:pro.category,
-            price:pro.price,
-            maxQuantity:pro.maxQuantity,
-            minQuantity:pro.maxQuantity,
-            images:[]
-          }
-           pro.imagetype.map((val,index)=>{
-            let image = fs.readFileSync(`./images/${pro._id}+${index}.${val.type}`);
-            const img64= Buffer.from(image).toString('base64');
-            const img={
-              data:img64.replace(`dataimage\/${val.type}base64`, ""),
-              type:val.type
-            }
-            temp.images.push(img);
-          })
-          products.push(temp)
-            
-          })
-          res.json(products)
-  })
-})
+      // res.json({Product:product,User:user})
+    })
+    .catch((e) => res.json({ error: "something went wrong . " }));
+});
+
+//get product with category
+app.post("/get-cat-products", (req, res) => {
+  item.find({ category: req.body.category }).then((data) => {
+    let products = [];
+
+    data.map((pro, index) => {
+      let temp = {
+        id: pro._id,
+        title: pro.title,
+        description: pro.description,
+        category: pro.category,
+        price: pro.price,
+        maxQuantity: pro.maxQuantity,
+        minQuantity: pro.maxQuantity,
+        images: [],
+      };
+      pro.imagetype.map((val, index) => {
+        let image = fs.readFileSync(`./images/${pro._id}+${index}.${val.type}`);
+        const img64 = Buffer.from(image).toString("base64");
+        const img = {
+          data: img64.replace(`dataimage\/${val.type}base64`, ""),
+          type: val.type,
+        };
+        temp.images.push(img);
+      });
+      products.push(temp);
+    });
+
+    res.json(products);
+  });
+});
+
+app.get("/newArrivals", (req, res) => {
+  item
+    .find({})
+    .sort({ _id: -1 })
+    .limit(6)
+    .then((data) => {
+      let products = [];
+
+      data.map((pro, index) => {
+        let temp = {
+          id: pro._id,
+          title: pro.title,
+          description: pro.description,
+          category: pro.category,
+          price: pro.price,
+          maxQuantity: pro.maxQuantity,
+          minQuantity: pro.maxQuantity,
+          images: [],
+        };
+        pro.imagetype.map((val, index) => {
+          let image = fs.readFileSync(
+            `./images/${pro._id}+${index}.${val.type}`
+          );
+          const img64 = Buffer.from(image).toString("base64");
+          const img = {
+            data: img64.replace(`dataimage\/${val.type}base64`, ""),
+            type: val.type,
+          };
+          temp.images.push(img);
+        });
+        products.push(temp);
+      });
+      res.json(products);
+    });
+});
+app.post("/searchProducts", (req, res) => {
+  item
+    .find({ title: { $regex: req.body.data, $options: "$i" } })
+    .then((data) => {
+      let products = [];
+
+      data.map((pro, index) => {
+        let temp = {
+          id: pro._id,
+          title: pro.title,
+          description: pro.description,
+          category: pro.category,
+          price: pro.price,
+          maxQuantity: pro.maxQuantity,
+          minQuantity: pro.maxQuantity,
+          images: [],
+        };
+        pro.imagetype.map((val, index) => {
+          let image = fs.readFileSync(
+            `./images/${pro._id}+${index}.${val.type}`
+          );
+          const img64 = Buffer.from(image).toString("base64");
+          const img = {
+            data: img64.replace(`dataimage\/${val.type}base64`, ""),
+            type: val.type,
+          };
+          temp.images.push(img);
+        });
+        products.push(temp);
+      });
+      res.json(products);
+    });
+});
 const port = process.env.PORT || 4000;
 //Start Server
 app.listen(port, () => {
   console.log("Server Has Started");
 });
- 
