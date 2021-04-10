@@ -62,13 +62,13 @@ router.get('/place-order/:id/:userId', async (req, res) => {
 router.post('/add-to-cart', async (req, res) => {
 
     try {
-        const { prodId, userId, name, storeId } = req.body;
+        const { prodId, userId, name} = req.body;
         const qnt = Math.abs(req.body.qnt)
         const foundCart = await Cart.findOne({ userId: userId })
 
         const newItem = {
             productId: prodId,
-            storeId: storeId,
+            userId: userId,
             name: name,
             quantity: qnt,
         }
@@ -142,6 +142,10 @@ router.get('/empty-cart/:id', async (req, res) => {
         console.log(e);
         res.json('Sorry  something went wrong')
     }
+})
+
+router.post('/confirm-product',(req, res)=>{
+    Cart.findOne({_id:req.body.id, "items.productId":req.body.productId}).then((cart)=>res.json(cart)).catch(((e)=>res.json(e)))
 })
 module.exports = router;
 

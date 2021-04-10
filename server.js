@@ -342,6 +342,7 @@ app.post('/products', (req, res)=>{
 
 //get single product
 app.post('/Product',(req,res)=>{
+  console.log('/product');
   item.findOne({_id:req.body.id}).then((data)=>{
     let product={
       title:data.title,
@@ -363,26 +364,21 @@ app.post('/Product',(req,res)=>{
       }
       product.images.push(img);
     })
-    //get user details
-    // User.findOne({_id:data.dealerId}).then((usr)=>{
-    //   let user={
-    //     name:usr.username,
-    //     email:usr.email,
-    //     number:usr.primaryPhone,
-    //     companyname:usr.companyname
-    //   }
-    //   res.json({Product:product,User:user});
-    // }).catch(e=>res.json({error:"something went wrong"}))
+    // get user details
+    User.findOne({_id:data.dealerId}).then((usr)=>{
+      let user={
+        name:usr.username,
+        email:usr.email,
+        number:usr.primaryPhone,
+        companyname:usr.companyname
+      }
+      res.json({Product:product,User:user});
+    }).catch(e=>res.json({error:"something went wrong"}))
     
-    let user={
-      name:"vaisakh",
-      email:"ckvaizz@gmail.com",
-      number:"4444444444",
-      companyname:"google"
-    }
-    res.json({Product:product,User:user})
     
-  }).catch(e=>res.json({error:"something went wrong"}))
+    // res.json({Product:product,User:user})
+    
+  }).catch(e=>res.json({error:"something went wrong . "}))
 })
  
 //get product with category
