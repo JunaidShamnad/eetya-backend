@@ -3,7 +3,8 @@ const router = require('express').Router()
 const bcrypt = require('bcryptjs')
 
 const category = require('../models/category');
-const User = require('../models/user')
+const User = require('../models/user');
+const Cart = require('../models/cart');
 
 
 const verifyAdmin = (req, res, next) => {
@@ -75,5 +76,7 @@ router.post('/accept', (req, res)=>{
         if(!err)res.json({status:true})
     })
 })
+
+
 
 module.exports = router;
