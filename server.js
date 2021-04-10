@@ -315,6 +315,7 @@ app.post('/products', (req, res)=>{
             price:pro.price,
             maxQuandity:pro.maxQuandity,
             minQuandity:pro.maxQuandity,
+            dealerId:pro.dealerId,
             images:[]
           }
            pro.imagetype.map((val,index)=>{
