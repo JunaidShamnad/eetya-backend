@@ -413,7 +413,68 @@ app.post("/get-cat-products",(req,res)=>{
           products.push(temp)
             
           })
-          console.log(products)
+          
+          res.json(products)
+  })
+})
+
+app.get('/newArrivals',(req,res)=>{
+  item.find({}).sort({"_id" : -1}).limit(6).then(data=>{
+    let products=[]
+          
+           data.map((pro,index)=>{
+            let temp ={
+              id:pro._id,
+             title:pro.title,
+            description:pro.description,
+            category:pro.category,
+            price:pro.price,
+            maxQuantity:pro.maxQuantity,
+            minQuantity:pro.maxQuantity,
+            images:[]
+          }
+           pro.imagetype.map((val,index)=>{
+            let image = fs.readFileSync(`./images/${pro._id}+${index}.${val.type}`);
+            const img64= Buffer.from(image).toString('base64');
+            const img={
+              data:img64.replace(`dataimage\/${val.type}base64`, ""),
+              type:val.type
+            }
+            temp.images.push(img);
+          })
+          products.push(temp)
+            
+          })
+          res.json(products)
+  })
+})
+app.post('/searchProducts',(req,res)=>{
+  item.find({ title: { $regex: req.body.data, $options: "$i" } }).then(data=>{
+    let products=[]
+          
+           data.map((pro,index)=>{
+            let temp ={
+              id:pro._id,
+             title:pro.title,
+            description:pro.description,
+            category:pro.category,
+            price:pro.price,
+            maxQuantity:pro.maxQuantity,
+            minQuantity:pro.maxQuantity,
+            images:[]
+          }
+           pro.imagetype.map((val,index)=>{
+            let image = fs.readFileSync(`./images/${pro._id}+${index}.${val.type}`);
+            const img64= Buffer.from(image).toString('base64');
+            const img={
+              data:img64.replace(`dataimage\/${val.type}base64`, ""),
+              type:val.type
+            }
+            temp.images.push(img);
+          })
+          products.push(temp)
+            
+          })
           res.json(products)
   })
 })
@@ -422,3 +483,4 @@ const port = process.env.PORT || 4000;
 app.listen(port, () => {
   console.log("Server Has Started");
 });
+ 
