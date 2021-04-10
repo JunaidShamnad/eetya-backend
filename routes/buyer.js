@@ -76,6 +76,7 @@ router.post("/add-to-cart", async (req, res) => {
       quantity: qnt,
       price: price,
     };
+    console.log(newItem);
     if (foundCart) {
       let isItemInCart = false;
       let allItems = foundCart.items.map((i) => {
@@ -117,14 +118,14 @@ router.post("/add-to-cart", async (req, res) => {
 
 router.post("/change-qnt", (req, res) => {
   try {
-    const { prodId, opt, userId } = req.body;
-    const newQnt = opt === "+" ? 1 : -1;
+    const {newQnt, prodId,  userId } = req.body;
+    
     Cart.findOneAndUpdate(
       { userId: userId, "items.productId": prodId },
       { $inc: { "items.$.quantity": newQnt } },
       { new: true }
     )
-      .then((cart) => res.json(cart))
+      .then((cart) => res.json({status:true}))
       .catch((e) => res.json({ err: e }));
   } catch (e) {
     console.log(e);
