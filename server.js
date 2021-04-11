@@ -56,7 +56,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(cors());
 app.use(
   cors({
-    origin: "http://localhost:3000", // <-- location of the react app were connecting to
+    origin: "https://eetyanew.leadlore.net/", // <-- location of the react app were connecting to
     credentials: true,
   })
 );
