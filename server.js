@@ -35,7 +35,7 @@ const categoryController = require("./controllers/categoryController");
 const item = require("./models/item");
 
 mongoose.connect(
-  process.env.mongoUri,
+  'mongodb+srv://junaid:intelpik123@cluster0.tnj61.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -43,9 +43,9 @@ mongoose.connect(
     useFindAndModify: false,
   },
   () => {
-    console.log("Mongoose Is Connected");
+    console.log('Mongoose Is Connected')
   }
-);
+)
 
 /// Middleware
 app.use(express.static("public"));
@@ -542,6 +542,26 @@ app.post("/getProduct-edit",(req,res)=>{
     });
     res.json(product)
   }).catch(e=>res.json({error:"something went worng"}))
+})
+
+app.post('/Edit-Product', (req, res) => {
+  console.log(req.body)
+  const { id, title, description,category, minQuantity, maxQuantity, price, images } = req.body
+  Item
+    .findOne({ _id: id })
+    .then((data) => {
+      data.title = title
+      data.description = description
+      data.category = category
+      data.minQuantity = minQuantity
+      data.maxQuantity = maxQuantity
+      data.price = price
+      return data.save()
+    })
+    .then((result) => {
+      console.log('UPDATED Product!')
+    })
+    .catch((e) => console.log('error: line 564',e))
 })
 app.post("/")
 
