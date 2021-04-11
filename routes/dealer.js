@@ -24,7 +24,7 @@ router.post("/add-item", async (req, res) => {
    //if (!req.session.Dealer) return res.json({ loginErr: true });
   try {
     const newItem = new Item({
-      dealerId: "60674897ef835a5c9d1f20c5"   ,
+      dealerId: data.dealerId ,
       title: data.title,
       description: data.description,
       category: data.category,

@@ -57,7 +57,6 @@ router.get("/place-order/:id/:userId", async (req, res) => {
         .catch((e) => console.log(e));
     } else res.json("Sorry something went wrong");
   } catch (e) {
-    console.log(e);
     res.json("Sorry something went wrong");
   }
 });
@@ -77,7 +76,6 @@ router.post("/add-to-cart", async (req, res) => {
       price: price,
       storeId: storeId
     };
-    console.log(newItem);
     if (foundCart) {
       let isItemInCart = false;
       let allItems = foundCart.items.map((i) => {
@@ -112,7 +110,6 @@ router.post("/add-to-cart", async (req, res) => {
         .catch((e) => res.json({ err: e }));
     }
   } catch (e) {
-    console.log(e);
     res.json({ err: "Sorry something went wrong" });
   }
 });
@@ -167,7 +164,6 @@ router.get("/empty-cart/:id", async (req, res) => {
 });
 
 router.post("/cart", (req, res) => {
-  console.log(req.body.id);
   Cart.findOne({ userId: req.body.id }).then((cart) => {
     console.log(cart);
     if (cart) {

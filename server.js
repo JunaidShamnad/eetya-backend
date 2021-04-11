@@ -86,17 +86,13 @@ app.use('/order', orderRouter)
 
 app.post("/add-item", (req, res) => {
   res.json("ok");
-  console.log(req.body);
 });
 
 app.post("/login", (req, res) => {
-  console.log(req.body);
   try {
     User.findOne({ email: req.body.email }).then((user, e) => {
-      console.log(e);
       if (user) {
         bcrypt.compare(req.body.password, user.password).then((data) => {
-          console.log(data);
           if (data) {
             const token = jwt.sign(
               { email: user.email, _id: user._id },
@@ -116,7 +112,6 @@ app.post("/login", (req, res) => {
     });
   } catch (e) {
     res.json({ err: "Sorry something went wrong" });
-    console.log(e);
   }
 });
 //email verification
@@ -136,8 +131,8 @@ var transporter = nodemailer.createTransport({
   service: "Gmail",
   auth: {
     // type: 'OAuth2',
-    user: "eetyawebsite@gmail.com",
-    pass: "eetya@123website",
+    user: "eetyainfo@gmail.com",
+    pass: "eetya123",
     // clientId:
     //   "173872994719-pvsnau5mbj47h0c6ea6ojrl7gjqq1908.apps.googleusercontent.com",
     // clientSecret: "OKXIYR14wBB_zumf30EC__iJ",
@@ -150,17 +145,15 @@ var transporter = nodemailer.createTransport({
 app.post("/sendEmail", (req, res) => {
   var mailOptions = {
     from: "eetyawebsite@gmail.com",
-    to: "vaisakh.k591@gmail.com, jobins9633@gmail.com",
+    to: "eetyawebsite@gmail.com",
     subject: "Sending Email using Node.js",
     text: "That was easy!",
   };
 
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-      console.log(error);
       res.json("error");
     } else {
-      console.log("Email sent: " + info.response);
       res.json("hello koiiii");
     }
   });
@@ -181,7 +174,6 @@ app.post("/sendEmail", (req, res) => {
 //   })(req, res, next);
 // });
 app.post("/register", (req, res) => {
-  console.log(req.body);
   User.findOne({ username: req.body.email }, async (err, doc) => {
     if (err) throw err;
     if (doc) res.send("User Already Exists");
@@ -243,7 +235,6 @@ app.post("/items-images", (req, res) => {
     `${__dirname}../client/public/uploads/${file.name}`,
     function (err) {
       if (err) {
-        console.log(err);
         return res.status(500).send({ msg: "Error occured" });
       }
       // returing the response with file path and name
@@ -285,8 +276,8 @@ app.post("/contact", (req, res) => {
   }
 
   var mailOptions = {
-    from: "eetyawebsite@gmail.com",
-    to: "vaisakh.k591@gmail.com, jobins9633@gmail.com",
+    from: "eetyainfo@gmail.com",
+    to: "eetyawebsite@gmail.com",
     subject: `${req.body.name} contacted you.`,
     html:
       "<h1>Hi Admin</h1></br><h3>" +
@@ -303,10 +294,8 @@ app.post("/contact", (req, res) => {
 
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-      console.log(error);
       res.json({ status: false });
     } else {
-      console.log("Email sent:" + info.response);
       res.json({ status: true });
     }
   });
@@ -350,7 +339,6 @@ app.post("/products", (req, res) => {
         });
         products.push(temp);
       });
-      console.log(products.length);
       return res.status(200).json(products);
     })
     .catch((err) => {
@@ -362,7 +350,6 @@ app.post("/products", (req, res) => {
 
 //get single product
 app.post("/Product", (req, res) => {
-  console.log("/product");
   item
     .findOne({ _id: req.body.id })
     .then((data) => {
