@@ -509,6 +509,7 @@ app.post("/searchProducts", (req, res) => {
 });
 //get-Dealer-Products
 app.post('/getDealerProduts',(req,res)=>{
+  console.log(req.body.dealerId)
   item.find({dealerId:req.body.dealerId}).then(data=>res.json(data))
 })
 //get product to edit
@@ -542,7 +543,7 @@ app.post("/getProduct-edit",(req,res)=>{
     res.json(product)
   }).catch(e=>res.json({error:"something went worng"}))
 })
-app.post("")
+app.post("/")
 
 const port = process.env.PORT || 4000;
 //Start Server
