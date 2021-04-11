@@ -35,7 +35,7 @@ const categoryController = require("./controllers/categoryController");
 const item = require("./models/item");
 
 mongoose.connect(
-  process.env.mongoUri,
+  'mongodb+srv://junaid:intelpik123@cluster0.tnj61.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -43,9 +43,9 @@ mongoose.connect(
     useFindAndModify: false,
   },
   () => {
-    console.log("Mongoose Is Connected");
+    console.log('Mongoose Is Connected')
   }
-);
+)
 
 /// Middleware
 app.use(express.static("public"));
@@ -494,6 +494,64 @@ app.post("/searchProducts", (req, res) => {
       res.json(products);
     });
 });
+//get-Dealer-Products
+app.post('/getDealerProduts',(req,res)=>{
+  console.log(req.body.dealerId)
+  item.find({dealerId:req.body.dealerId}).then(data=>res.json(data))
+})
+//get product to edit
+
+app.post("/getProduct-edit",(req,res)=>{
+  item
+  .findOne({ _id: req.body.Id })
+  .then((data) => {
+    let product = {
+      title: data.title,
+      id: data._id,
+      description: data.description,
+      added_date: data.date_added,
+      minQuantity: data.minQuantity,
+      maxQuantity: data.maxQuantity,
+      category: data.category,
+      price: data.price,
+      images: [],
+    };
+    data.imagetype.map((val, index) => {
+      let image = fs.readFileSync(
+        `./images/${data._id}+${index}.${val.type}`
+      );
+      const img64 = Buffer.from(image).toString("base64");
+      const img = {
+        data: img64.replace(`dataimage\/${val.type}base64`, ""),
+        type: val.type,
+      };
+      product.images.push(img);
+    });
+    res.json(product)
+  }).catch(e=>res.json({error:"something went worng"}))
+})
+
+app.post('/Edit-Product', (req, res) => {
+  console.log(req.body)
+  const { id, title, description,category, minQuantity, maxQuantity, price, images } = req.body
+  Item
+    .findOne({ _id: id })
+    .then((data) => {
+      data.title = title
+      data.description = description
+      data.category = category
+      data.minQuantity = minQuantity
+      data.maxQuantity = maxQuantity
+      data.price = price
+      return data.save()
+    })
+    .then((result) => {
+      console.log('UPDATED Product!')
+    })
+    .catch((e) => console.log('error: line 564',e))
+})
+app.post("/")
+
 const port = process.env.PORT || 4000;
 //Start Server
 app.listen(port, () => {
