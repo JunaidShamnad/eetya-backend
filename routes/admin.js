@@ -132,7 +132,6 @@ router.get("/users", (req, res) => {
 });
 
 router.post("/remove-user", (req, res) => {
-    console.log('remove');
   user
     .deleteOne({ _id: req.body.id })
     .then(() => {
@@ -142,5 +141,6 @@ router.post("/remove-user", (req, res) => {
       res.json({ status: false });
     });
 });
+
 
 module.exports = router;

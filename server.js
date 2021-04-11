@@ -496,7 +496,6 @@ app.post("/searchProducts", (req, res) => {
 });
 //get-Dealer-Products
 app.post('/getDealerProduts',(req,res)=>{
-  console.log(req.body.dealerId)
   item.find({dealerId:req.body.dealerId}).then(data=>res.json(data))
 })
 //get product to edit
@@ -532,7 +531,6 @@ app.post("/getProduct-edit",(req,res)=>{
 })
 
 app.post('/Edit-Product', (req, res) => {
-  console.log(req.body)
   const { id, title, description,category, minQuantity, maxQuantity, price, images } = req.body
   Item
     .findOne({ _id: id })

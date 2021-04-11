@@ -1,7 +1,9 @@
 const router = require("express").Router();
 const Cart = require("../models/cart");
 const Item = require("../models/item");
+const order = require("../models/order");
 const Order = require("../models/order");
+const user = require('../models/user')
 
 // home route for buyers
 router.get("/", async (req, res) => {
@@ -74,7 +76,7 @@ router.post("/add-to-cart", async (req, res) => {
       name: name,
       quantity: qnt,
       price: price,
-      storeId: storeId
+      storeId: storeId,
     };
     if (foundCart) {
       let isItemInCart = false;
@@ -186,18 +188,114 @@ router.post("/confirm-product", (req, res) => {
     .catch((e) => res.json(e));
 });
 
-router.post('/cart-count', (req, res)=>{
-    const {userId} = req.body
+router.post("/cart-count", (req, res) => {
+  const { userId } = req.body;
 
-    console.log('cart-count'+userId);
-    Cart.find({userId:userId}).then((cart)=>{
-        if(cart.items){
-            res.json({count:cart.items.length})
-        }else{
-            res.json({count:0})
+  console.log("cart-count" + userId);
+  Cart.find({ userId: userId }).then((cart) => {
+    if (cart.items) {
+      res.json({ count: cart.items.length });
+    } else {
+      res.json({ count: 0 });
+    }
+  });
+});
+
+router.post("/user-details", (req, res) => {
+  const { id } = req.body;
+  user.findOne({ _id: id }, (userDetails) => {
+    console.log(userDetails);
+    res.json(userDetails);
+  });
+});
+
+router.post("/get-cart", (req, res) => {
+  Cart.findOne({ storeId: req.body.id }).then((cart) => {
+    if (cart) {
+      res.json({ cart });
+    } else {
+      res.json({ error: "no cart found" });
+    }
+  });
+});
+
+router.post("/get-orders", (req, res) => {
+  const { id } = req.body;
+  let data = [];
+  order
+    .find({ storeId: id })
+    .sort({ _id: -1 })
+    .limit(25)
+    .then(async (orders) => {
+      for (i in orders) {
+        let buyer = await user.findOne({ _id: orders[i].userId });
+        let totalPrice = 0;
+        for (j in orders[i].items) {
+          let price = orders[i].items[j].quantity * orders[i].items[j].price;
+          totalPrice = totalPrice + price;
         }
-    })
-})
+        data[i] = {
+          buyerName: buyer.username,
+          buyerEmail:buyer.email,
+          buyerPhone:buyer.primaryPhone,
+          cartTotal: totalPrice,
+        };
+      }
 
+      res.json(data);
+    });
+});
+
+router.post("/get-orders-buyer", (req, res) => {
+  const { id } = req.body;
+  let data = [];
+  order
+    .find({ userId: id })
+    .sort({ _id: -1 })
+    .limit(25)
+    .then(async (orders) => {
+      if(!order)res.end()
+      for (i in orders) {
+        let Dealer = await user.findOne({ _id: orders[i].userId });
+        console.log(Dealer);
+        let totalPrice = 0;
+        for (j in orders[i].items) {
+          let price = orders[i].items[j].quantity * orders[i].items[j].price;
+          totalPrice = totalPrice + price;
+        }
+        data[i] = {
+          dealerName: Dealer.username,
+          dealerEmail:Dealer.email,
+          dealerPhone:Dealer.primaryPhone,
+          cartTotal: totalPrice,
+        };
+      }
+
+      res.json(data);
+    });
+});
+
+router.post("/get-products", (req, res) => {
+  const { id } = req.body;
+  Item.find({ dealerId: id }, (products) => {
+    return products;
+  })
+    .then((products) => {
+      res.json(products);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+router.post("/remove-product", (req, res) => {
+  Item.deleteOne({ _id: req.body.id })
+    .then(() => {
+      res.json({ status: true });
+    })
+    .catch(() => {
+      res.json({ status: false });
+    });
+});
 
 module.exports = router;
