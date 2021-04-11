@@ -6,11 +6,7 @@ const CartSchema = new Schema({
     userId: {
         type: String,
     },
-    items: [],
-    price:{
-        type:Number,
-        required:true
-    }
+    items: []
     // bill: {
     //     type: Number,
     //     required: true,
