@@ -48,8 +48,8 @@ mongoose.connect(
 )
 
 /// Middleware
-// app.use(express.static("public"));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static("public"));
+// app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(bodyParser({ limit: "50mb" }));
 app.use(bodyParser.json());
@@ -300,6 +300,7 @@ app.post("/contact", (req, res) => {
 });
 
 app.post("/products", (req, res) => {
+  console.log('/products');
   const pagination = req.body.pagination ? parseInt(req.body.pagination) : 12;
   //PageNumber From which Page to Start
   const pageNumber = req.body.page ? parseInt(req.body.page) : 1;
@@ -326,7 +327,7 @@ app.post("/products", (req, res) => {
         };
         pro.imagetype.map((val, index) => {
           let image = fs.readFileSync(
-            `${__dirname}/images/${pro._id}+${index}.${val.type}`
+            `./public/images/${pro._id}+${index}.${val.type}`
           );
           const img64 = Buffer.from(image).toString("base64");
           const img = {
@@ -364,7 +365,7 @@ app.post("/Product", (req, res) => {
       };
       data.imagetype.map((val, index) => {
         let image = fs.readFileSync(
-          `../images/${data._id}+${index}.${val.type}`
+          `./public/images/${data._id}+${index}.${val.type}`
         );
         const img64 = Buffer.from(image).toString("base64");
         const img = {
@@ -383,6 +384,7 @@ app.post("/Product", (req, res) => {
             number: usr.primaryPhone,
             companyname: usr.companyname,
           };
+          console.log({ Product: product, User: user });
           res.json({ Product: product, User: user });
         })
         .catch((e) => res.json({ error: "something went wrong" }));
@@ -409,7 +411,7 @@ app.post("/get-cat-products", (req, res) => {
         images: [],
       };
       pro.imagetype.map((val, index) => {
-        let image = fs.readFileSync(`./images/${pro._id}+${index}.${val.type}`);
+        let image = fs.readFileSync(`./public/images/${pro._id}+${index}.${val.type}`);
         const img64 = Buffer.from(image).toString("base64");
         const img = {
           data: img64.replace(`dataimage\/${val.type}base64`, ""),
@@ -445,7 +447,7 @@ app.get("/newArrivals", (req, res) => {
         };
         pro.imagetype.map((val, index) => {
           let image = fs.readFileSync(
-            `../images/${pro._id}+${index}.${val.type}`
+            `./public/images/${pro._id}+${index}.${val.type}`
           );
           const img64 = Buffer.from(image).toString("base64");
           const img = {
@@ -478,7 +480,7 @@ app.post("/searchProducts", (req, res) => {
         };
         pro.imagetype.map((val, index) => {
           let image = fs.readFileSync(
-            `../images/${pro._id}+${index}.${val.type}`
+            `./public/images/${pro._id}+${index}.${val.type}`
           );
           const img64 = Buffer.from(image).toString("base64");
           const img = {
@@ -515,7 +517,7 @@ app.post("/getProduct-edit",(req,res)=>{
     };
     data.imagetype.map((val, index) => {
       let image = fs.readFileSync(
-        `../images/${data._id}+${index}.${val.type}`
+        `./public/images/${data._id}+${index}.${val.type}`
       );
       const img64 = Buffer.from(image).toString("base64");
       const img = {
