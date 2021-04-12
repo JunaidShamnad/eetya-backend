@@ -56,7 +56,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(cors());
 app.use(
   cors({
-    origin: "https://etya-3.web.app/", // <-- location of the react app were connecting to
+    origin: true, // <-- location of the react app were connecting to
     credentials: true,
   })
 );
