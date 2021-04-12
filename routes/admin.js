@@ -93,16 +93,16 @@ router.get("/orders", (req, res) => {
     .limit(25)
     .then(async (orders) => {
       for (i in orders) {
-        // let buyer = await User.findOne({ _id: mongoose.Types.ObjectId(orders[i].userId) });
-        // let dealer = await User.findOne({ _id: mongoose.Types.ObjectId(orders[i].storeId) });
+        let buyer = await User.findOne({ _id: mongoose.Types.ObjectId(orders[i].userId) });
+        let dealer = await User.findOne({ _id: mongoose.Types.ObjectId(orders[i].storeId) });
         let totalPrice = 0;
         for (j in orders[i].items) {
           let price = orders[i].items[j].quantity * orders[i].items[j].price;
           totalPrice = totalPrice + price;
         }
         data[i] = {
-          // buyerName: buyer.username,
-          // dealerName: dealer.username,
+          buyerName: buyer.username,
+          dealerName: dealer.username,
           cartTotal: totalPrice,
         };
       }
