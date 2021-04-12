@@ -53,13 +53,13 @@ app.use(express.static("public"));
 app.use(bodyParser({ limit: "50mb" }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
-// app.use(
-//   cors({
-//     origin: "https://eetyanew.leadlore.net/", // <-- location of the react app were connecting to
-//     credentials: true,
-//   })
-// );
+// app.use(cors());
+app.use(
+  cors({
+    origin: "https://etya-3.web.app/", // <-- location of the react app were connecting to
+    credentials: true,
+  })
+);
 
 app.use(fileUpload());
 app.use(
