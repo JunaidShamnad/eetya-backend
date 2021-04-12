@@ -41,7 +41,7 @@ router.post("/add-item", async (req, res) => {
         for(let i=0;i<data.image.length;i++){
           item.imagetype.map((img,key)=>{
             let base64 = data.image[i].Image.replace(/^data:image\/png;base64,/, "");
-            fs.writeFileSync(`../images/${item._id}+${i}.${img.type}`, base64, "base64");
+            fs.writeFileSync(`./public/images/${item._id}+${i}.${img.type}`, base64, "base64");
             
           })
           

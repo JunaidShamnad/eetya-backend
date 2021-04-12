@@ -325,7 +325,7 @@ app.post("/products", (req, res) => {
         };
         pro.imagetype.map((val, index) => {
           let image = fs.readFileSync(
-            `../images/${pro._id}+${index}.${val.type}`
+            `${__dirname}/images/${pro._id}+${index}.${val.type}`
           );
           const img64 = Buffer.from(image).toString("base64");
           const img = {
