@@ -79,11 +79,8 @@ app.use(cookieParser("secretcode"));
 
 // Routes
 // admin route
-app.use("/admin", adminRoute);
-app.use("/buyer", buyerRoute);
-app.use("/dealer", dealerRouter);
-app.use('/order', orderRouter)
 
+app.get("/", (req, res)=>res.json('eetya backend'))
 app.post("/add-item", (req, res) => {
   res.json("ok");
 });
@@ -548,8 +545,11 @@ app.post('/Edit-Product', (req, res) => {
     })
     .catch((e) => console.log('error: line 564',e))
 })
-app.post("/")
 
+app.use("/admin", adminRoute);
+app.use("/buyer", buyerRoute);
+app.use("/dealer", dealerRouter);
+app.use('/order', orderRouter)
 const port = process.env.PORT || 4000;
 //Start Server
 app.listen(port, () => {
