@@ -325,7 +325,7 @@ app.post("/products", (req, res) => {
         };
         pro.imagetype.map((val, index) => {
           let image = fs.readFileSync(
-            `./images/${pro._id}+${index}.${val.type}`
+            `../images/${pro._id}+${index}.${val.type}`
           );
           const img64 = Buffer.from(image).toString("base64");
           const img = {
@@ -363,7 +363,7 @@ app.post("/Product", (req, res) => {
       };
       data.imagetype.map((val, index) => {
         let image = fs.readFileSync(
-          `./images/${data._id}+${index}.${val.type}`
+          `../images/${data._id}+${index}.${val.type}`
         );
         const img64 = Buffer.from(image).toString("base64");
         const img = {
@@ -444,7 +444,7 @@ app.get("/newArrivals", (req, res) => {
         };
         pro.imagetype.map((val, index) => {
           let image = fs.readFileSync(
-            `./images/${pro._id}+${index}.${val.type}`
+            `../images/${pro._id}+${index}.${val.type}`
           );
           const img64 = Buffer.from(image).toString("base64");
           const img = {
@@ -477,7 +477,7 @@ app.post("/searchProducts", (req, res) => {
         };
         pro.imagetype.map((val, index) => {
           let image = fs.readFileSync(
-            `./images/${pro._id}+${index}.${val.type}`
+            `../images/${pro._id}+${index}.${val.type}`
           );
           const img64 = Buffer.from(image).toString("base64");
           const img = {
@@ -514,7 +514,7 @@ app.post("/getProduct-edit",(req,res)=>{
     };
     data.imagetype.map((val, index) => {
       let image = fs.readFileSync(
-        `./images/${data._id}+${index}.${val.type}`
+        `../images/${data._id}+${index}.${val.type}`
       );
       const img64 = Buffer.from(image).toString("base64");
       const img = {
