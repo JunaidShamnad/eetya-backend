@@ -191,8 +191,8 @@ router.post("/confirm-product", (req, res) => {
 router.post("/cart-count", (req, res) => {
   const { userId } = req.body;
 
-  console.log("cart-count" + userId);
-  Cart.find({ userId: userId }).then((cart) => {
+  Cart.findOne({ userId: userId }).then((cart) => {
+    console.log(cart);
     if (cart.items) {
       res.json({ count: cart.items.length });
     } else {
