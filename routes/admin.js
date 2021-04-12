@@ -88,7 +88,7 @@ router.post("/accept", (req, res) => {
 router.get("/orders", (req, res) => {
   let data = [];
   order
-    .find()
+    .find({})
     .sort({ _id: -1 })
     .limit(25)
     .then(async (orders) => {
