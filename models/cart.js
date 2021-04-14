@@ -4,7 +4,8 @@ const Schema = mongoose.Schema;
 
 const CartSchema = new Schema({
     userId: {
-        type: String,
+        type: Schema.Types.ObjectId,
+        required:true
     },
     items: []
     // bill: {

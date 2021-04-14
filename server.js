@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const ObjectId = mongoose.Types.ObjectId
+const ObjectId = mongoose.Types.ObjectId;
 const express = require("express");
 const cors = require("cors");
 // const passport = require("passport");
@@ -20,7 +20,7 @@ const jwt = require("jsonwebtoken");
 const adminRoute = require("./routes/admin");
 const buyerRoute = require("./routes/buyer");
 const dealerRouter = require("./routes/dealer");
-const orderRouter = require('./routes/order')
+const orderRouter = require("./routes/order");
 
 const app = express();
 dotenv.config();
@@ -33,9 +33,10 @@ const Category = require("./models/category");
 
 const categoryController = require("./controllers/categoryController");
 const item = require("./models/item");
+const newsLetter = require("./models/newletter");
 
 mongoose.connect(
-  'mongodb+srv://junaid:intelpik123@cluster0.tnj61.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+  "mongodb+srv://junaid:intelpik123@cluster0.tnj61.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -43,9 +44,9 @@ mongoose.connect(
     useFindAndModify: false,
   },
   () => {
-    console.log('Mongoose Is Connected')
+    console.log("Mongoose Is Connected");
   }
-)
+);
 
 /// Middleware
 app.use(express.static("public"));
@@ -81,7 +82,7 @@ app.use(cookieParser("secretcode"));
 // Routes
 // admin route
 
-app.get("/", (req, res)=>res.json('eetya backend'))
+app.get("/", (req, res) => res.json("eetya backend"));
 app.post("/add-item", (req, res) => {
   res.json("ok");
 });
@@ -102,7 +103,7 @@ app.post("/login", (req, res) => {
             } else {
               res.json({ unVerified: true });
             }
-          } else res.json({ err: "Password wrong" });
+          } else res.json({ err: "Invalid Login!" });
         });
       } else {
         res.json({ err: "User not found" });
@@ -300,7 +301,7 @@ app.post("/contact", (req, res) => {
 });
 
 app.post("/products", (req, res) => {
-  console.log('/products');
+  console.log("/products");
   const pagination = req.body.pagination ? parseInt(req.body.pagination) : 12;
   //PageNumber From which Page to Start
   const pageNumber = req.body.page ? parseInt(req.body.page) : 1;
@@ -384,7 +385,6 @@ app.post("/Product", (req, res) => {
             number: usr.primaryPhone,
             companyname: usr.companyname,
           };
-          console.log({ Product: product, User: user });
           res.json({ Product: product, User: user });
         })
         .catch((e) => res.json({ error: "something went wrong" }));
@@ -411,7 +411,9 @@ app.post("/get-cat-products", (req, res) => {
         images: [],
       };
       pro.imagetype.map((val, index) => {
-        let image = fs.readFileSync(`./public/images/${pro._id}+${index}.${val.type}`);
+        let image = fs.readFileSync(
+          `./public/images/${pro._id}+${index}.${val.type}`
+        );
         const img64 = Buffer.from(image).toString("base64");
         const img = {
           data: img64.replace(`dataimage\/${val.type}base64`, ""),
@@ -495,64 +497,118 @@ app.post("/searchProducts", (req, res) => {
     });
 });
 //get-Dealer-Products
-app.post('/getDealerProduts',(req,res)=>{
-  item.find({dealerId:req.body.dealerId}).then(data=>res.json(data))
-})
+app.post("/getDealerProduts", (req, res) => {
+  item.find({ dealerId: req.body.dealerId }).then((data) => res.json(data));
+});
 //get product to edit
 
-app.post("/getProduct-edit",(req,res)=>{
+app.post("/getProduct-edit", (req, res) => {
   item
-  .findOne({ _id: req.body.Id })
-  .then((data) => {
-    let product = {
-      title: data.title,
-      id: data._id,
-      description: data.description,
-      added_date: data.date_added,
-      minQuantity: data.minQuantity,
-      maxQuantity: data.maxQuantity,
-      category: data.category,
-      price: data.price,
-      images: [],
-    };
-    data.imagetype.map((val, index) => {
-      let image = fs.readFileSync(
-        `./public/images/${data._id}+${index}.${val.type}`
-      );
-      const img64 = Buffer.from(image).toString("base64");
-      const img = {
-        data: img64.replace(`dataimage\/${val.type}base64`, ""),
-        type: val.type,
-      };
-      product.images.push(img);
-    });
-    res.json(product)
-  }).catch(e=>res.json({error:"something went worng"}))
-})
-
-app.post('/Edit-Product', (req, res) => {
-  const { id, title, description,category, minQuantity, maxQuantity, price, images } = req.body
-  Item
-    .findOne({ _id: id })
+    .findOne({ _id: req.body.Id })
     .then((data) => {
-      data.title = title
-      data.description = description
-      data.category = category
-      data.minQuantity = minQuantity
-      data.maxQuantity = maxQuantity
-      data.price = price
-      return data.save()
+      let product = {
+        title: data.title,
+        id: data._id,
+        description: data.description,
+        added_date: data.date_added,
+        minQuantity: data.minQuantity,
+        maxQuantity: data.maxQuantity,
+        category: data.category,
+        price: data.price,
+        images: [],
+      };
+      data.imagetype.map((val, index) => {
+        let image = fs.readFileSync(
+          `./public/images/${data._id}+${index}.${val.type}`
+        );
+        const img64 = Buffer.from(image).toString("base64");
+        const img = {
+          data: img64.replace(`dataimage\/${val.type}base64`, ""),
+          type: val.type,
+        };
+        product.images.push(img);
+      });
+      res.json(product);
+    })
+    .catch((e) => res.json({ error: "something went worng" }));
+});
+
+app.post("/Edit-Product", (req, res) => {
+  const {
+    id,
+    title,
+    description,
+    category,
+    minQuantity,
+    maxQuantity,
+    price,
+    images,
+  } = req.body;
+  Item.findOne({ _id: id })
+    .then((data) => {
+      data.title = title;
+      data.description = description;
+      data.category = category;
+      data.minQuantity = minQuantity;
+      data.maxQuantity = maxQuantity;
+      data.price = price;
+      return data.save();
     })
     .then((result) => {
-      console.log('UPDATED Product!')
+      console.log("UPDATED Product!");
     })
-    .catch((e) => console.log('error: line 564',e))
-})
+    .catch((e) => console.log("error: line 564", e));
+});
+
+app.post("/add-newsletter", (req, res) => {
+  const { email } = req.body;
+  newsLetter
+    .updateOne(
+      { _id: ObjectId("6077172aa222e635d8e6559d") },
+      {
+        $inc: { count: 1 },
+        $push: { emails: email },
+      }
+    )
+    .then(() => {
+      res.json({ status: true });
+    })
+    .catch(() => {
+      res.json({ status: false });
+    });
+});
+
+app.post("/help-center", (req, res) => {
+  const { message, email } = req.body;
+
+  var transporter = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+      user: "eetyainfo@gmail.com",
+      pass: "eetya123",
+    },
+  });
+
+  var mailOptions = {
+    from: "eetyainfo@gmail.com",
+    to: "eetyawebite@gmail.com, jobins9633@gmail.com",
+    subject: "msg from Eetya help center",
+    html: "<h3>Dear admin</h3><br><p>Email " + email + "</p></br>" + message,
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      res.json({ status: false });
+    } else {
+      res.json({ status: true });
+    }
+  });
+});
 
 app.use("/admin", adminRoute);
 app.use("/buyer", buyerRoute);
 app.use("/dealer", dealerRouter);
-app.use('/order', orderRouter)
+app.use("/order", orderRouter);
 const port = process.env.PORT || 4000;
 //Start Server
 app.listen(port, () => {

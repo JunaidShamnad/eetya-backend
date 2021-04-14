@@ -4,9 +4,10 @@ const router = Router();
 
 const Order = require("../models/order");
 const nodemailer = require("nodemailer");
-const cart = require("../models/cart");
+const Cart = require("../models/cart");
 const user = require("../models/user");
 const order = require("../models/order");
+const { ObjectId } = require("mongodb");
 
 const Email = (dealerEmail, buyerEmail, name, price, quantity) => {
   var transporter = nodemailer.createTransport({
@@ -60,10 +61,10 @@ const EmailCheckout = (dealerEmail, buyerEmail, price, quantity) => {
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
-      return error
+      return error;
     } else {
       console.log("Email sent:" + info.response);
-      return true
+      return true;
     }
   });
 };
@@ -81,14 +82,14 @@ router.post("/buy-now", (req, res) => {
   } = req.body;
 
   const newOrder = new Order({
-    storeId: storeId,
-    userId: userId,
+    userId: ObjectId(userId),
     items: [
       {
         productId: productId,
-        title: name,
+        name: name,
         price: price,
         quantity: quantity,
+        storeId: ObjectId(storeId),
       },
     ],
   });
@@ -101,26 +102,30 @@ router.post("/buy-now", (req, res) => {
 router.post("/checkout", (req, res) => {
   const { userId, userEmail } = req.body;
   let dealerEmail = " ";
-  console.log('userid'+userId);
-  cart.find({ userId: userId }).then(async (cart) => {
-    for (i in cart.items) {
-      let storeId = cart.items[0].storeId;
+  console.log("userid " + userId);
+  Cart.find({ userId: userId }).then(async (cart) => {
+    for (i in cart[0].items) {
+      let storeId = cart[0].items[i].storeId;
       let store = await user.find({ _id: storeId });
       dealerEmail = dealerEmail + store.email;
+
+      const newOrder = new Order({
+        userId: ObjectId(userId),
+        items: cart[0].items[i],
+      });
+      newOrder.save();
     }
 
-    const newOrder = new Order({
-      storeId: "123456",
-      userId: userId,
-      items: cart.items,
-    });
-    newOrder.save().then(() => {
-      res.json({ status: true });
-      EmailCheckout(dealerEmail, userEmail);
-      order.deleteOne({userid:userId})
-    });
+    EmailCheckout(dealerEmail, userEmail);
+    Cart.deleteOne({ userId: userId })
+      .then(() => {
+        console.log("data deleted");
+        res.json({ status: true });
+      })
+      .catch(() => {
+        res.json({ status: false });
+      });
   });
-  
 });
 
 module.exports = router;

@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const ItemSchema = new Schema({
     dealerId: {
-        type: String,
+        type: Schema.Types.ObjectId,
         required: true
     },
     title: {

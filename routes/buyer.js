@@ -3,7 +3,8 @@ const Cart = require("../models/cart");
 const Item = require("../models/item");
 const order = require("../models/order");
 const Order = require("../models/order");
-const user = require('../models/user')
+const user = require("../models/user");
+const {ObjectId} = require('mongodb')
 
 // home route for buyers
 router.get("/", async (req, res) => {
@@ -68,15 +69,15 @@ router.post("/add-to-cart", async (req, res) => {
   try {
     const { prodId, userId, name, price, storeId } = req.body;
     const qnt = Math.abs(req.body.qnt);
-    const foundCart = await Cart.findOne({ userId: userId });
+    const foundCart = await Cart.findOne({ userId: ObjectId(userId) });
 
     const newItem = {
       productId: prodId,
-      userId: userId,
+      userId: ObjectId(userId),
       name: name,
       quantity: qnt,
       price: price,
-      storeId: storeId,
+      storeId: ObjectId(storeId)
     };
     if (foundCart) {
       let isItemInCart = false;
@@ -192,9 +193,12 @@ router.post("/cart-count", (req, res) => {
   const { userId } = req.body;
 
   Cart.findOne({ userId: userId }).then((cart) => {
-    console.log(cart);
-    if (cart.items) {
-      res.json({ count: cart.items.length });
+    if (cart) {
+      if (cart.items) {
+        res.json({ count: cart.items.length });
+      } else {
+        res.json({ count: 0 });
+      }
     } else {
       res.json({ count: 0 });
     }
@@ -220,58 +224,42 @@ router.post("/get-cart", (req, res) => {
 });
 
 router.post("/get-orders", (req, res) => {
+  console.log('/get-orders');
   const { id } = req.body;
-  let data = [];
+  
   order
-    .find({ storeId: id })
+    .find({ "items.storeId": ObjectId(id) })
     .sort({ _id: -1 })
     .limit(25)
     .then(async (orders) => {
-      for (i in orders) {
-        let buyer = await user.findOne({ _id: orders[i].userId });
-        let totalPrice = 0;
-        for (j in orders[i].items) {
-          let price = orders[i].items[j].quantity * orders[i].items[j].price;
-          totalPrice = totalPrice + price;
-        }
-        data[i] = {
-          buyerName: buyer.username,
-          buyerEmail:buyer.email,
-          buyerPhone:buyer.primaryPhone,
-          cartTotal: totalPrice,
-        };
-      }
+      if (!orders) res.end();
+      let OrderDetails = new Array();
 
-      res.json(data);
+      await Promise.all(
+        orders.map(async (order, i) => {
+          let retailer = await user.findOne({ _id: order.userId });
+          OrderDetails[i] = {
+            _id: order._id,
+            phone: retailer.primaryPhone,
+            name: retailer.username,
+            email: retailer.email,
+            items: order.items,
+          };
+        })
+      )
+      res.json(OrderDetails)
     });
 });
 
 router.post("/get-orders-buyer", (req, res) => {
   const { id } = req.body;
-  let data = [];
   order
-    .find({ userId: id })
+    .find({ userId: ObjectId(id) })
     .sort({ _id: -1 })
     .limit(25)
     .then(async (orders) => {
-      if(!order)res.end()
-      for (i in orders) {
-        let Dealer = await user.findOne({ _id: orders[i].userId });
-        console.log(Dealer);
-        let totalPrice = 0;
-        for (j in orders[i].items) {
-          let price = orders[i].items[j].quantity * orders[i].items[j].price;
-          totalPrice = totalPrice + price;
-        }
-        data[i] = {
-          dealerName: Dealer.username,
-          dealerEmail:Dealer.email,
-          dealerPhone:Dealer.primaryPhone,
-          cartTotal: totalPrice,
-        };
-      }
-
-      res.json(data);
+      if (!orders) res.end();
+      res.json(orders);
     });
 });
 
