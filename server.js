@@ -528,12 +528,14 @@ app.post("/getProduct-edit", (req, res) => {
         };
         product.images.push(img);
       });
+     
       res.json(product);
     })
     .catch((e) => res.json({ error: "something went worng" }));
 });
-
+// edit-product
 app.post("/Edit-Product", (req, res) => {
+  let oldimgTypes=[];
   const {
     id,
     title,
@@ -544,18 +546,45 @@ app.post("/Edit-Product", (req, res) => {
     price,
     images,
   } = req.body;
+  
   Item.findOne({ _id: id })
-    .then((data) => {
+    .then(async (data) => {
       data.title = title;
       data.description = description;
       data.category = category;
       data.minQuantity = minQuantity;
       data.maxQuantity = maxQuantity;
       data.price = price;
+      if(images.length!=0){
+        oldimgTypes=data.imagetype;
+
+        let imgtypes=[]
+  //geting  new image type to a array
+  await images.map((img,index)=>{
+    let tmp = img.type.split("/")
+    let obj={
+      index:index,
+      type:tmp[1]
+    }
+    imgtypes.push(obj)
+  })
+data.imagetype = imgtypes;
+// deleting old images
+await oldimgTypes.map((img,index)=>{
+fs.unlinkSync(`./public/images/${id}+${index}.${img.type}`);
+})
+
+ await data.imagetype.map((img,key)=>{
+  let base64 = images[key].Image.replace(/^data:image\/png;base64,/, "");
+  fs.writeFileSync(`./public/images/${id}+${key}.${img.type}`, base64, "base64");
+  
+})
+}
       return data.save();
     })
     .then((result) => {
       console.log("UPDATED Product!");
+      res.json({status:true})
     })
     .catch((e) => console.log("error: line 564", e));
 });
