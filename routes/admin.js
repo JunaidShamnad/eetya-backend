@@ -114,7 +114,6 @@ router.get("/orders", (req, res) => {
         })
       );
       res.json(data);
-      console.log(data);
     })
     .catch((e) => console.log(e));
 });

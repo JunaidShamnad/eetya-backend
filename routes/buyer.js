@@ -5,6 +5,7 @@ const order = require("../models/order");
 const Order = require("../models/order");
 const user = require("../models/user");
 const {ObjectId} = require('mongodb')
+var otpGenerator = require('otp-generator')
 
 // home route for buyers
 router.get("/", async (req, res) => {
@@ -285,5 +286,35 @@ router.post("/remove-product", (req, res) => {
       res.json({ status: false });
     });
 });
+
+router.post('/change-pass-create', (req, res)=>{
+  const {email} = req.body;
+  const otp = (otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets:false }))
+  console.log('otp: '+otp)
+
+  user.update(
+    {email: email},
+    {
+      $set: {
+        otp: otp,
+        otpCreatedAt:Date.now()
+      }
+    } ).then(() =>{
+      res.json({status:true})
+    })
+    .catch(err =>{
+      if(err){
+        res.json({status:false})
+      }
+    })
+  
+})
+
+router.post('/change-pass-verify', (req, res)=>{
+  
+  // if(otp == parseInt(otp)){
+  //   console.log('verified');
+  // }
+})
 
 module.exports = router;
