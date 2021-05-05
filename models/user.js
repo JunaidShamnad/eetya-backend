@@ -62,6 +62,12 @@ const user = new mongoose.Schema({
   isVerified:{
     type:Boolean,
     default: false
+  },
+  otp:{
+    type:Number
+  },
+  otpCreatedAt:{
+    type:Date
   }
 });
 

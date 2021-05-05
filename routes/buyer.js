@@ -4,8 +4,15 @@ const Item = require("../models/item");
 const order = require("../models/order");
 const Order = require("../models/order");
 const user = require("../models/user");
-const {ObjectId} = require('mongodb')
-var otpGenerator = require('otp-generator')
+const { ObjectId } = require("mongodb");
+var otpGenerator = require("otp-generator");
+const bcrypt = require("bcryptjs");
+const nodemailer = require("nodemailer");
+
+
+
+
+
 
 // home route for buyers
 router.get("/", async (req, res) => {
@@ -78,7 +85,7 @@ router.post("/add-to-cart", async (req, res) => {
       name: name,
       quantity: qnt,
       price: price,
-      storeId: ObjectId(storeId)
+      storeId: ObjectId(storeId),
     };
     if (foundCart) {
       let isItemInCart = false;
@@ -225,9 +232,9 @@ router.post("/get-cart", (req, res) => {
 });
 
 router.post("/get-orders", (req, res) => {
-  console.log('/get-orders');
+  console.log("/get-orders");
   const { id } = req.body;
-  
+
   order
     .find({ "items.storeId": ObjectId(id) })
     .sort({ _id: -1 })
@@ -247,8 +254,8 @@ router.post("/get-orders", (req, res) => {
             items: order.items,
           };
         })
-      )
-      res.json(OrderDetails)
+      );
+      res.json(OrderDetails);
     });
 });
 
@@ -287,34 +294,103 @@ router.post("/remove-product", (req, res) => {
     });
 });
 
-router.post('/change-pass-create', (req, res)=>{
-  const {email} = req.body;
-  const otp = (otpGenerator.generate(6, { upperCase: false, specialChars: false, alphabets:false }))
-  console.log('otp: '+otp)
+router.post("/change-pass-create",async (req, res) => {
 
-  user.update(
-    {email: email},
-    {
-      $set: {
-        otp: otp,
-        otpCreatedAt:Date.now()
-      }
-    } ).then(() =>{
-      res.json({status:true})
-    })
-    .catch(err =>{
-      if(err){
-        res.json({status:false})
-      }
-    })
-  
-})
 
-router.post('/change-pass-verify', (req, res)=>{
+  const { email } = req.body;
+  const otp = otpGenerator.generate(6, {
+    upperCase: false,
+    specialChars: false,
+    alphabets: false,
+  });
+  console.log("otp: " + otp);
+  console.log("email: " + email);
+
+  let userFound = await user.findOne({email: email})
+
+  if (!userFound) {
+    return res.json({ status: false });
+  }
+
+  var transporter = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+      user: "eetyainfo@gmail.com",
+      pass: "eetya123",
+    },
+  });
+
+  var mailOptions = {
+    from: "eetyainfo@gmail.com",
+    to: userFound.email,
+    subject: `EETYA || OTP for Reset Password`,
+    html: "<h1>Dear Customer, </h1></br><h3> The OTP (One Time Password) For reset password is <b>"+otp+"</b> . Do not share OTP with anyone. </h3>",
+  };
+
   
-  // if(otp == parseInt(otp)){
-  //   console.log('verified');
-  // }
+
+  user
+    .updateOne(
+      { email: email },
+      {
+        $set: {
+          otp: otp,
+          otpCreatedAt: Date.now(),
+        },
+      }
+    )
+    .then(() => {
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.log(error);
+          return 
+        } else {
+          console.log("Email sent:" + info.response);
+          res.json({ status: true });
+
+        }
+      });
+
+    })
+    
+     
+    
+});
+
+router.post("/change-pass-verify",async (req, res) => {
+  console.log('change pass verify');
+  const {otp, email} = req.body
+  if(!email){
+    return res.json({status: false})
+  }
+  let userAvailable =await user.findOne({email: email})
+  if(!userAvailable){
+    return res.json({status: false})
+  }
+
+  if(userAvailable.otp == parseInt(otp)){
+    return res.json({status:true})
+  }else{
+    return res.json({status: false})
+  }
+});
+
+router.post("/change-pass-update",async(req, res)=>{
+  const {email, password} = req.body;
+  if(!email){
+    return res.json({status: false})
+  }
+  let userAvailable =await user.findOne({email: email})
+  if(!userAvailable){
+    return res.json({status: false})
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  user.updateOne({email:email}, {
+    $set: {password:hashedPassword,otp:null, otpCreatedAt:null}
+  }).then(() =>{
+    res.json({status: true})
+  })
 })
 
 module.exports = router;
