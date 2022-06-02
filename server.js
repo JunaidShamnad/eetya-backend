@@ -36,7 +36,7 @@ const item = require("./models/item");
 const newsLetter = require("./models/newletter");
 
 mongoose.connect(
-  "mongodb+srv://junaid:intelpik123@cluster0.tnj61.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+  "Mongoose ",
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
